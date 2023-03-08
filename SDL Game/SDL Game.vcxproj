@@ -79,7 +79,7 @@
       <AdditionalIncludeDirectories>C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_mixer-2.6.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2-2.26.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_image-2.6.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_mixer-2.6.3\lib\x86;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_image-2.6.3\lib\x86;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2-2.26.3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -96,7 +96,7 @@
       <AdditionalIncludeDirectories>C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_mixer-2.6.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2-2.26.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_image-2.6.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -113,7 +113,7 @@
       <AdditionalIncludeDirectories>C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_mixer-2.6.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2-2.26.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_image-2.6.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_mixer-2.6.3\lib\x86;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_image-2.6.3\lib\x86;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2-2.26.3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -130,7 +130,7 @@
       <AdditionalIncludeDirectories>C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_mixer-2.6.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2-2.26.3\include;C:\Users\Ian Sushruth Tauro\Desktop\SDL\SDL2_image-2.6.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -150,6 +150,7 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\hs.dat" />
     <None Include="SDL Game.aps" />
     <None Include="SDL2.dll" />
     <None Include="SDL2_image.dll" />
@@ -170,15 +171,19 @@
     <Image Include="assets\textures\background.png" />
     <Image Include="assets\textures\bottom_pipe.png" />
     <Image Include="assets\textures\cat.png" />
+    <Image Include="assets\textures\deadcat.png" />
     <Image Include="assets\textures\end.png" />
     <Image Include="assets\textures\floor.png" />
     <Image Include="assets\textures\icon.png" />
     <Image Include="assets\textures\numbers.png" />
+    <Image Include="assets\textures\pause.png" />
     <Image Include="assets\textures\ready.png" />
+    <Image Include="assets\textures\star.png" />
     <Image Include="assets\textures\top_pipe.png" />
     <Image Include="icon1.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="assets\audio\bgm.mp3" />
     <Media Include="assets\audio\death.wav" />
     <Media Include="assets\audio\jump.wav" />
     <Media Include="assets\audio\point.wav" />
