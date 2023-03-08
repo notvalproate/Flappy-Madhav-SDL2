@@ -15,6 +15,28 @@ void Audio::PlaySound() {
 	Mix_PlayChannel(Channel, Sound, 0);
 }
 
-void Audio::SetVolume(int vol) {
+Music::Music(const char* path, int vol, int chan) {
+	Song = Mix_LoadMUS(path);
 	Volume = (MIX_MAX_VOLUME * vol) / 100;
+	Channel = chan;
+}
+
+Music::~Music() {
+	Mix_FreeMusic(Song);
+}
+
+void Music::PlayMusic() {
+	Mix_VolumeMusic(Volume);
+	Mix_PlayMusic(Song, 10);
+}
+
+void Music::StopMusic() {
+	Mix_HaltMusic();
+}
+void Music::PauseMusic() {
+	Mix_PauseMusic();
+}
+
+void Music::ResumeMusic() {
+	Mix_ResumeMusic();
 }

@@ -7,8 +7,21 @@ public:
 	~Audio();
 
 	void PlaySound();
-	void SetVolume(int vol);
 private:
 	Mix_Chunk* Sound;
+	int Volume, Channel;
+};
+
+class Music {
+public:
+	Music(const char* path, int vol, int chan);
+	~Music();
+
+	void PlayMusic();
+	void StopMusic();
+	void PauseMusic();
+	void ResumeMusic();
+private:
+	Mix_Music* Song;
 	int Volume, Channel;
 };

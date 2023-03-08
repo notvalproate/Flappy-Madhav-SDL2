@@ -1,5 +1,6 @@
 #include "Pipe.hpp"
 #include "Texture.hpp"
+#include <cmath>
 #include <iostream>
 #include <random>
 
@@ -8,13 +9,7 @@ Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const i
 	TopTex = Texture::LoadTexture(toptex, Renderer);
 	BottomTex = Texture::LoadTexture(bottomtex, Renderer);
 	Velocity = width / 4;
-	if (offset == 0) { 
-		next = true;
-	}
-	else {
-		next = false;
-	}
-
+	passed = false;
 	xpos = width;
 
 	std::random_device rd;
@@ -36,6 +31,8 @@ Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const i
 	Bottom.h = Bottom.w * ((float)BottomSize.y / (float)BottomSize.x);
 	Bottom.x = xpos + offset * (width + Top.w) / 4;
 	Bottom.y = bottom + (width / 8);
+
+	Distance = Bottom.x;
 }
 
 Pipe::~Pipe() {
@@ -43,18 +40,16 @@ Pipe::~Pipe() {
 	SDL_DestroyTexture(BottomTex);
 }
 
-bool Pipe::Update(const int& DeltaTime, const bool& Dead, Score* Count) {
-	if (Dead) {
-		return false;
-	}
-
-	int Distance = Velocity * (DeltaTime / 1000.0);
-	Top.x -= Distance;
-	Bottom.x -= Distance;
+bool Pipe::Update(const int& DeltaTime) {
+	Distance -= static_cast<float> (Velocity * DeltaTime) / static_cast < float> (1000);
+	Top.x = std::round(Distance);
+	Bottom.x = std::round(Distance);
 
 	if (Top.x + Top.w <= 0) {
+		passed = false;
 		Top.x = xpos;
 		Bottom.x = xpos;
+		Distance = xpos;
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<int> dist(0, 8);
@@ -63,9 +58,8 @@ bool Pipe::Update(const int& DeltaTime, const bool& Dead, Score* Count) {
 		Bottom.y = bottom + (xpos / 8);
 	}
 
-	if (next && Top.x + Top.w <= xpos / 2) {
-		Count->Increment();
-		next = false;
+	if (!passed && Top.x + Top.w <= (xpos / 2) - (ypos / 30)) {
+		passed = true;
 		return true;
 	}
 
@@ -78,12 +72,7 @@ void Pipe::Render() {
 }
 
 void Pipe::ResetPipe(const int& offset) {
-	if (offset == 0) {
-		next = true; 
-	}
-	else {
-		next = false;
-	}
+	passed = false;
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<int> dist(0, 8);
@@ -93,6 +82,7 @@ void Pipe::ResetPipe(const int& offset) {
 	Bottom.y = bottom + (xpos / 8);
 	Top.x = xpos + offset * (xpos + Top.w) / 4;
 	Bottom.x = xpos + offset * (xpos + Top.w) / 4;
+	Distance = Top.x;
 }
 
 bool Pipe::CheckCollision(const int& catx, const int& caty, const int& catw, const int& cath) {

@@ -48,6 +48,7 @@
     <None Include="SDL2_image.dll" />
     <None Include="SDL2_mixer.dll" />
     <None Include="SDL Game.aps" />
+    <None Include="assets\hs.dat" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game.hpp">
@@ -109,6 +110,15 @@
     <Image Include="icon1.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
+    <Image Include="assets\textures\deadcat.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="assets\textures\pause.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="assets\textures\star.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\audio\death.wav">
@@ -120,6 +130,7 @@
     <Media Include="assets\audio\point.wav">
       <Filter>リソース ファイル</Filter>
     </Media>
+    <Media Include="assets\audio\bgm.mp3" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SDL Game.rc">

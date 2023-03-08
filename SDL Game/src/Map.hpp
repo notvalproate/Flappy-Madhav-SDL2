@@ -10,13 +10,14 @@ public:
 	Map(SDL_Renderer* Ren, const int& width, const int& height);
 	~Map();
 
-	void Update(const int& DeltaTime, const bool& Dead, Audio* Point);
+	void Update(const int& DeltaTime, Audio* Point);
 	void Render();
 	void ResetMap();
 	bool CheckCollision(const int& catx, const int& caty, const int& catw, const int& cath);
 
 private:
 	Score* Count;
+	HighScore* HS;
 	SDL_Renderer* Renderer;
 	Floor* F;
 	Pipe* P[4];

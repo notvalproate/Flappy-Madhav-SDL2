@@ -5,12 +5,14 @@ Map::Map(SDL_Renderer* Ren, const int& width, const int& height) {
 	Renderer = Ren;
 	Count = new Score("assets/textures/numbers.png", Ren, width, height);
 	F = new Floor("assets/textures/floor.png", Renderer, width, height);
+	HS = new HighScore("assets/textures/numbers.png", "assets/textures/star.png", Ren, width, height);
 	for (int i = 0; i < 4; i++) {
 		P[i] = new Pipe("assets/textures/top_pipe.png", "assets/textures/bottom_pipe.png", Renderer, width, height, i);
 	}
 }
 
 Map::~Map() { 
+	free(HS);
 	free(Count);
 	free(F);
 	free(P[0]);
@@ -19,14 +21,18 @@ Map::~Map() {
 	free(P[3]);
 }
 
-void Map::Update(const int& DeltaTime, const bool& Dead, Audio* Point) {
+void Map::Update(const int& DeltaTime, Audio* Point) {
 	for (int i = 0; i < 4; i++) {
-		if (P[i]->Update(DeltaTime, Dead, Count)) {
-			P[(i + 1) % 4]->next = true;
+		if (P[i]->Update(DeltaTime)) {
 			Point->PlaySound();
+			Count->Increment();
+			if (Count->GetCount() > HS->GetCount()) {
+				HS->Increment(); 
+				HS->SetUpdate();
+			}
 		}
 	}
-	F->Update(DeltaTime, Dead);
+	F->Update(DeltaTime);
 }
 
 void Map::Render() {
@@ -35,6 +41,7 @@ void Map::Render() {
 	}
 	F->Render();
 	Count->Render();
+	HS->Render();
 }
 
 void Map::ResetMap() {
@@ -45,15 +52,13 @@ void Map::ResetMap() {
 }
 
 bool Map::CheckCollision(const int& catx, const int& caty, const int& catw, const int& cath) {
-	for (int i = 0; i < 4; i++) {
-		if (P[i]->next) {
-			if (P[i]->CheckCollision(catx, caty, catw, cath)) {
-				return true;
-			};
-			break;
-		}
-	}
+	if (P[Count->GetCount() % 4]->CheckCollision(catx, caty, catw, cath)) {
+			HS->Write();
+			return true;
+	};
+
 	if (caty + cath >= F->GetHeight() || caty <= 0) {
+		HS->Write();
 		return true;
 	}
 

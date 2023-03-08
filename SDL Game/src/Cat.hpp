@@ -2,27 +2,34 @@
 #include "SDL.h"
 #include "Texture.hpp"
 #include "Map.hpp"
-#include "Audio.hpp"
-#include <vector>
+
+enum CatState {
+	Ready,
+	Alive,
+	Dead
+};
 
 class Cat {
 public:
-	Cat(const char* texturepath, SDL_Renderer* Ren, const int& width, const int& height);
+	Cat(SDL_Renderer* Ren, const int& width, const int& height);
 	~Cat();
-
-	void Jump(Map* TheMap, Audio* JumpSound);
-	void Update(const int& DeltaTime, const int& height, Map* TheMap, Audio* DeathSound);
+	
+	void Jump();
+	bool Update(const int& DeltaTime, Map* TheMap, bool& DeathDelay);
 	void Render();
-	bool GetDeath() { return Dead; }
-	bool GetStart() { return Start; }
+	void ResetCat();
 
 private:
+	CatState State;
 	int x, y;
+	float caty;
 	float Gravity;
 	float Velocity;
-	bool Dead;
-	bool Start;
-	SDL_Texture* CatTex;
+	float KeyFrame, IdleLoc;
+	SDL_Texture *CatTex, *DeadCatTex;
 	SDL_Rect DestRect;
 	SDL_Renderer* Renderer;
+
+	void ApplyGravity(const int& DeltaTime);
+	void Idle(const int& DeltaTime);
 };
