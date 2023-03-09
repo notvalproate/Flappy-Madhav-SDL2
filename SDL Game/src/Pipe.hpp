@@ -15,9 +15,11 @@ public:
 private:
 	bool passed;
 	float Distance;
-	int xpos, ypos;
+	int ScreenW, ScreenH, ScoreLine;
 	int Velocity;
 	SDL_Rect Top, Bottom;
 	SDL_Texture* TopTex, * BottomTex;
 	SDL_Renderer* Renderer;
+
+	void SetPipeGap(const int& offset);
 };

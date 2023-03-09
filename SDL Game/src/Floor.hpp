@@ -9,10 +9,13 @@ public:
 	void Update(const int& DeltaTime);
 	void Render();
 	int GetHeight() { return FirstHalf.y; }
+
 private:
 	int Velocity;
 	float Distance;
 	SDL_Rect SrcRect, FirstHalf, SecondHalf;
 	SDL_Texture* FloorTex;
 	SDL_Renderer* Renderer;
+
+	void ResetFloor();
 };

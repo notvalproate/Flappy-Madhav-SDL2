@@ -75,7 +75,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	Jump = new Audio("assets/audio/jump.wav", 30, 1);
 	Death = new Audio("assets/audio/death.wav", 50, -1);
 	Point = new Audio("assets/audio/point.wav", 20, 0);
-	BGM = new Music("assets/audio/bgm.mp3", 60, 2);
+	BGM = new Music("assets/audio/bgm.mp3", 60);
 }
 
 void Game::JumpCat() {

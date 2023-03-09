@@ -9,7 +9,7 @@ Score::Score(const char* texpath, SDL_Renderer* Ren, const int& width, const int
 	DestRect.x = height / 20;
 	DestRect.y = height / 20;
 	DestRect.h = height / 10;
-	xpos = DestRect.x;
+	ResetX = DestRect.x;
 
 	Digits.push_back(0);
 	Count = 0;
@@ -69,15 +69,15 @@ void Score::Render() {
 		DestRect.x += DestRect.w + 1;
 	}
 
-	DestRect.x = xpos;
+	DestRect.x = ResetX;
 }
 
 
 HighScore::HighScore(const char* texpath, const char* startex, SDL_Renderer* Ren, const int& width, const int& height) {
 	DestRect.x = (width - (height / 20)) + 1;
 	DestRect.y = height / 20;
-	DestRect.h = height / 10; \
-	xpos = DestRect.x;
+	DestRect.h = height / 10; 
+	ResetX = DestRect.x;
 
 	Read();
 	Renderer = Ren;
@@ -107,7 +107,7 @@ void HighScore::Render() {
 	DestRect.x -= (DestRect.w + 5);
 	SDL_RenderCopy(Renderer, StarTex, NULL, &DestRect);
 
-	DestRect.x = xpos;
+	DestRect.x = ResetX;
 }
 
 void HighScore::Read() {

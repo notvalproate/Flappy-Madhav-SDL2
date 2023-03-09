@@ -15,10 +15,9 @@ void Audio::PlaySound() {
 	Mix_PlayChannel(Channel, Sound, 0);
 }
 
-Music::Music(const char* path, int vol, int chan) {
+Music::Music(const char* path, int vol) {
 	Song = Mix_LoadMUS(path);
 	Volume = (MIX_MAX_VOLUME * vol) / 100;
-	Channel = chan;
 }
 
 Music::~Music() {
@@ -26,6 +25,10 @@ Music::~Music() {
 }
 
 void Music::PlayMusic() {
+	if (Mix_PlayingMusic()) {
+		Mix_HaltMusic();
+	}
+
 	Mix_VolumeMusic(Volume);
 	Mix_PlayMusic(Song, 10);
 }
@@ -33,6 +36,7 @@ void Music::PlayMusic() {
 void Music::StopMusic() {
 	Mix_HaltMusic();
 }
+
 void Music::PauseMusic() {
 	Mix_PauseMusic();
 }

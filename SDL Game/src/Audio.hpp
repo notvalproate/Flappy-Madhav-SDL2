@@ -14,7 +14,7 @@ private:
 
 class Music {
 public:
-	Music(const char* path, int vol, int chan);
+	Music(const char* path, int vol);
 	~Music();
 
 	void PlayMusic();
@@ -23,5 +23,5 @@ public:
 	void ResumeMusic();
 private:
 	Mix_Music* Song;
-	int Volume, Channel;
+	int Volume;
 };

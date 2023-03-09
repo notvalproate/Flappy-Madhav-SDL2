@@ -8,15 +8,17 @@ Cat::Cat(SDL_Renderer* Ren, const int& width, const int& height) {
 	Renderer = Ren;
 	DestRect.w = height / 15;
 	DestRect.h = DestRect.w;
-	x = width / 2;
-	y = height / 2;
-	DestRect.x = x - (DestRect.w / 2);
-	DestRect.y = y - (DestRect.h / 2);
-	caty = DestRect.y;
-	IdleLoc = 0;
+
+	CenterY = height / 2;
+	DestRect.x = width / 2 - (DestRect.w / 2);
+	DestRect.y = CenterY - (DestRect.h / 2);
+	CatY = DestRect.y;
+
+	IdleOffset = 0;
 	Velocity = 0;
 	Gravity = DestRect.h * 45;
 	KeyFrame = 0;
+
 	State = Ready;
 }
 
@@ -25,9 +27,10 @@ Cat::~Cat() {
 }
 
 void Cat::ResetCat() {
-	DestRect.y = y - (DestRect.h / 2);
-	caty = DestRect.y;
+	CatY = CenterY - (DestRect.h / 2);
+	DestRect.y = CatY;
 	Velocity = 0;
+	KeyFrame = 0;
 	State = Ready;
 }
 
@@ -41,15 +44,15 @@ void Cat::Jump() {
 
 void Cat::ApplyGravity(const int& DeltaTime) {
 	Velocity += (Gravity * static_cast<float> (DeltaTime)) / static_cast<float>(1000);
-	caty += static_cast<float>(Velocity * DeltaTime) / static_cast <float>(1000);
-	DestRect.y = std::round(caty);
+	CatY += static_cast<float>(Velocity * DeltaTime) / static_cast <float>(1000);
+	DestRect.y = std::round(CatY);
 }
 
 bool Cat::Update(const int& DeltaTime, Map* TheMap,bool& DeathDelay) {	
 	switch (State) {
 		case Ready:
 			Idle(DeltaTime);
-			return false;
+			break;
 
 		case Alive:
 			if (TheMap->CheckCollision(DestRect.x, DestRect.y, DestRect.w, DestRect.h)) {
@@ -59,19 +62,20 @@ bool Cat::Update(const int& DeltaTime, Map* TheMap,bool& DeathDelay) {
 				return true;
 			}
 			ApplyGravity(DeltaTime);
-			return false;
+			break;
 
 		case Dead:
-			if (caty <= y * 2) ApplyGravity(DeltaTime);
-			return false;
+			if (CatY <= CenterY * 2) ApplyGravity(DeltaTime);
+			break;
 	}
+	return false;
 }
 
 void Cat::Render() {
 	switch (State) {
 		case Dead:
 			SDL_RenderCopy(Renderer, DeadCatTex, NULL, &DestRect);
-			break;
+			return;
 		default:
 			SDL_RenderCopy(Renderer, CatTex, NULL, &DestRect);
 			break;
@@ -83,6 +87,6 @@ void Cat::Idle(const int& DeltaTime) {
 	KeyFrame += x * 5;
 	if (KeyFrame > 6.2831) KeyFrame = 0;
 
-	IdleLoc = (std::sin(KeyFrame)) * DestRect.h / 6;
-	DestRect.y = std::round(caty + IdleLoc);
+	IdleOffset = (std::sin(KeyFrame)) * DestRect.h / 6;
+	DestRect.y = std::round(CatY + IdleOffset);
 }

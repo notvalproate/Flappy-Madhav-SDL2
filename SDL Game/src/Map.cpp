@@ -28,7 +28,6 @@ void Map::Update(const int& DeltaTime, Audio* Point) {
 			Count->Increment();
 			if (Count->GetCount() > HS->GetCount()) {
 				HS->Increment(); 
-				HS->SetUpdate();
 			}
 		}
 	}

@@ -14,17 +14,15 @@ Floor::Floor(const char* texturepath, SDL_Renderer* Ren, const int& width, const
 	SrcRect.w = size.x;
 	SrcRect.h = 10;
 
-	Distance = 0;
-
-	FirstHalf.x = 0;
 	FirstHalf.y = (height * 9) / 10;
 	FirstHalf.w = width;
 	FirstHalf.h = height / 10;
 
-	SecondHalf.x = width;
-	SecondHalf.y = (height * 9) / 10;
-	SecondHalf.w = width;
-	SecondHalf.h = height / 10;
+	SecondHalf.y = FirstHalf.y;
+	SecondHalf.w = FirstHalf.w;
+	SecondHalf.h = FirstHalf.h;
+
+	ResetFloor();
 
 	Velocity = width / 4;
 }
@@ -33,15 +31,19 @@ Floor::~Floor() {
 	SDL_DestroyTexture(FloorTex);
 }
 
+void Floor::ResetFloor() {
+	Distance = 0;
+	FirstHalf.x = 0;
+	SecondHalf.x = FirstHalf.w;
+}
+
 void Floor::Update(const int& DeltaTime) {
 	Distance -= static_cast<float> (Velocity * DeltaTime) / static_cast <float> (1000);
 	FirstHalf.x = std::round(Distance);
 	SecondHalf.x = std::round(Distance) + FirstHalf.w;
 
 	if (SecondHalf.x <= 0) {
-		Distance = 0;
-		FirstHalf.x = 0;
-		SecondHalf.x = FirstHalf.w;
+		ResetFloor();
 	}
 }
 

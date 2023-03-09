@@ -21,11 +21,11 @@ public:
 
 private:
 	CatState State;
-	int x, y;
-	float caty;
+	int CenterY;
+	float CatY;
 	float Gravity;
 	float Velocity;
-	float KeyFrame, IdleLoc;
+	float KeyFrame, IdleOffset;
 	SDL_Texture *CatTex, *DeadCatTex;
 	SDL_Rect DestRect;
 	SDL_Renderer* Renderer;

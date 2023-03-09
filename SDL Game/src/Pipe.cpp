@@ -10,29 +10,20 @@ Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const i
 	BottomTex = Texture::LoadTexture(bottomtex, Renderer);
 	Velocity = width / 4;
 	passed = false;
-	xpos = width;
-
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> dist(0, 7);
-	ypos = height;
-	int bottom = (height / 10) + (dist(gen) * (height / 18));
+	ScreenW = width;
+	ScreenH = height;
+	ScoreLine = (ScreenW / 2) - (ScreenH / 30);
 
 	SDL_Point TopSize, BottomSize;
 	SDL_QueryTexture(TopTex, NULL, NULL, &TopSize.x, &TopSize.y);
 	SDL_QueryTexture(BottomTex, NULL, NULL, &BottomSize.x, &BottomSize.y);
 
 	Top.w = width / 10;
-	Top.h = Top.w * ((float) TopSize.y / (float) TopSize.x);
-	Top.x = xpos + offset * (width + Top.w) / 4;
-	Top.y = bottom - Top.h;
-
+	Top.h = (int) (Top.w * ((float) TopSize.y / (float) TopSize.x));
 	Bottom.w = Top.w;
-	Bottom.h = Bottom.w * ((float)BottomSize.y / (float)BottomSize.x);
-	Bottom.x = xpos + offset * (width + Top.w) / 4;
-	Bottom.y = bottom + (width / 8);
+	Bottom.h = (int) (Bottom.w * ((float)BottomSize.y / (float)BottomSize.x));
 
-	Distance = Bottom.x;
+	SetPipeGap(offset);
 }
 
 Pipe::~Pipe() {
@@ -42,23 +33,15 @@ Pipe::~Pipe() {
 
 bool Pipe::Update(const int& DeltaTime) {
 	Distance -= static_cast<float> (Velocity * DeltaTime) / static_cast < float> (1000);
-	Top.x = std::round(Distance);
-	Bottom.x = std::round(Distance);
+	Top.x = (int) std::round(Distance);
+	Bottom.x = (int) std::round(Distance);
 
 	if (Top.x + Top.w <= 0) {
 		passed = false;
-		Top.x = xpos;
-		Bottom.x = xpos;
-		Distance = xpos;
-		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<int> dist(0, 8);
-		int bottom = (ypos / 10) + (dist(gen) * (ypos / 18));
-		Top.y = bottom - Top.h;
-		Bottom.y = bottom + (xpos / 8);
+		SetPipeGap(0);
 	}
 
-	if (!passed && Top.x + Top.w <= (xpos / 2) - (ypos / 30)) {
+	if (!passed && Top.x + Top.w <= ScoreLine) {
 		passed = true;
 		return true;
 	}
@@ -73,16 +56,7 @@ void Pipe::Render() {
 
 void Pipe::ResetPipe(const int& offset) {
 	passed = false;
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> dist(0, 8);
-	int bottom = (ypos / 10) + (dist(gen) * (ypos / 18));
-
-	Top.y = bottom - Top.h;
-	Bottom.y = bottom + (xpos / 8);
-	Top.x = xpos + offset * (xpos + Top.w) / 4;
-	Bottom.x = xpos + offset * (xpos + Top.w) / 4;
-	Distance = Top.x;
+	SetPipeGap(offset);
 }
 
 bool Pipe::CheckCollision(const int& catx, const int& caty, const int& catw, const int& cath) {
@@ -100,4 +74,17 @@ bool Pipe::CheckCollision(const int& catx, const int& caty, const int& catw, con
 	}
 
 	return false;
+}
+
+void Pipe::SetPipeGap(const int& offset) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> dist(0, 8);
+	int bottom = (ScreenH / 10) + (dist(gen) * (ScreenH / 18));
+	Top.y = bottom - Top.h;
+	Bottom.y = bottom + (ScreenW / 8);
+
+	Top.x = ScreenW + offset * (ScreenW + Top.w) / 4;
+	Bottom.x = ScreenW + offset * (ScreenW + Top.w) / 4;
+	Distance = (float) Bottom.x;
 }
