@@ -39,7 +39,7 @@ void Cat::Jump() {
 		State = Alive;
 	}
 
-	Velocity = DestRect.h * -13;
+	Velocity = DestRect.h * -12.5;
 }
 
 void Cat::ApplyGravity(const int& DeltaTime) {

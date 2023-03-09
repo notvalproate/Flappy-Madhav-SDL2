@@ -24,7 +24,7 @@ Floor::Floor(const char* texturepath, SDL_Renderer* Ren, const int& width, const
 
 	ResetFloor();
 
-	Velocity = width / 4;
+	Velocity = width / 4.5;
 }
 
 Floor::~Floor() { 

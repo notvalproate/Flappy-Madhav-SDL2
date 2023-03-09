@@ -8,7 +8,7 @@ Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const i
 	Renderer = Ren;
 	TopTex = Texture::LoadTexture(toptex, Renderer);
 	BottomTex = Texture::LoadTexture(bottomtex, Renderer);
-	Velocity = width / 4;
+	Velocity = width / 4.5;
 	passed = false;
 	ScreenW = width;
 	ScreenH = height;
