@@ -4,7 +4,7 @@
 
 class Pipe {
 public:
-	Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const int& width, const int& height, const int& offset);
+	Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const int& width, const int& height, const int& offset, const int& vel);
 	~Pipe();
 
 	bool Update(const int& DeltaTime);

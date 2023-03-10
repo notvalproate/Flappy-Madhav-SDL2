@@ -4,11 +4,11 @@
 #include <iostream>
 #include <random>
 
-Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const int& width, const int& height, const int& offset) {
+Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const int& width, const int& height, const int& offset, const int& vel) {
 	Renderer = Ren;
 	TopTex = Texture::LoadTexture(toptex, Renderer);
 	BottomTex = Texture::LoadTexture(bottomtex, Renderer);
-	Velocity = width / 4.5;
+	Velocity = vel;
 	passed = false;
 	ScreenW = width;
 	ScreenH = height;
@@ -21,7 +21,7 @@ Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const i
 	Top.w = width / 10;
 	Top.h = (int) (Top.w * ((float) TopSize.y / (float) TopSize.x));
 	Bottom.w = Top.w;
-	Bottom.h = (int) (Bottom.w * ((float)BottomSize.y / (float)BottomSize.x));
+	Bottom.h = (int) (Bottom.w * ((float) BottomSize.y / (float)BottomSize.x));
 
 	SetPipeGap(offset);
 }

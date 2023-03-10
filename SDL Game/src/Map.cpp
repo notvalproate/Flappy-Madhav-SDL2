@@ -1,17 +1,20 @@
 #include "Map.hpp"
 #include <iostream>
 
-Map::Map(SDL_Renderer* Ren, const int& width, const int& height) {
+Map::Map(SDL_Renderer* Ren, const int& width, const int& height, const int& vel) {
 	Renderer = Ren;
+	//Initialize Score, Highscore, Floor, and Pipe objects
 	Count = new Score("assets/textures/numbers.png", Ren, width, height);
-	F = new Floor("assets/textures/floor.png", Renderer, width, height);
+	F = new Floor("assets/textures/floor.png", Renderer, width, height, vel);
 	HS = new HighScore("assets/textures/numbers.png", "assets/textures/star.png", Ren, width, height);
+	//Only 4 pipes as there are max of 4 pipes on the screen at once
 	for (int i = 0; i < 4; i++) {
-		P[i] = new Pipe("assets/textures/top_pipe.png", "assets/textures/bottom_pipe.png", Renderer, width, height, i);
+		P[i] = new Pipe("assets/textures/top_pipe.png", "assets/textures/bottom_pipe.png", Renderer, width, height, i, vel);
 	}
 }
 
 Map::~Map() { 
+	//Free all pointers
 	free(HS);
 	free(Count);
 	free(F);
@@ -22,19 +25,22 @@ Map::~Map() {
 }
 
 void Map::Update(const int& DeltaTime, Audio* Point) {
+	//Update every pipe's position
 	for (int i = 0; i < 4; i++) {
-		if (P[i]->Update(DeltaTime)) {
-			Point->PlaySound();
+		if (P[i]->Update(DeltaTime)) { //Update() returns true if the pipe passed the screen's halfway mark (Increment the Score)
+			Point->PlaySound(); //Play point scored sound and increment score
 			Count->Increment();
-			if (Count->GetCount() > HS->GetCount()) {
+			if (Count->GetCount() > HS->GetCount()) { //If the score exceeded highscore, increment highscore as well
 				HS->Increment(); 
 			}
 		}
 	}
+	//Update the floor's position
 	F->Update(DeltaTime);
 }
 
 void Map::Render() {
+	//Render each pipe and the floor and scores
 	for (int i = 0; i < 4; i++) {
 		P[i]->Render();
 	}
@@ -44,6 +50,7 @@ void Map::Render() {
 }
 
 void Map::ResetMap() {
+	//Reset the Score Count and the pipes positions
 	Count->Reset();
 	for (int i = 0; i < 4; i++) {
 		P[i]->ResetPipe(i);
@@ -51,15 +58,19 @@ void Map::ResetMap() {
 }
 
 bool Map::CheckCollision(const int& catx, const int& caty, const int& catw, const int& cath) {
+	//Check for collisions of the next pipe. [Score mod 4] gives which pipe is the next pipe, as the pipes loop around 
+	//Hence check collision only with the next pipe
 	if (P[Count->GetCount() % 4]->CheckCollision(catx, caty, catw, cath)) {
-			HS->Write();
+			HS->Write(); //If collided, write the Highscore to the hs.dat file and return true
 			return true;
 	};
 
+	//Checking collision with floor and doing the same
 	if (caty + cath >= F->GetHeight() || caty <= 0) {
-		HS->Write();
+		HS->Write(); 
 		return true;
 	}
 
+	//Return false if no collision detected
 	return false;
 }

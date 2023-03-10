@@ -22,8 +22,8 @@ public:
 	void Update(const int& DeltaTime); 
 	void Render();
 	void Clean();
-	bool Exit() { return IsRunning; }
-	int GetDelta() { return FrameDelta; }
+	inline bool Exit() { return IsRunning; }
+	inline int GetDelta() { return FrameDelta; }
 	
 private:
 	GameState State;

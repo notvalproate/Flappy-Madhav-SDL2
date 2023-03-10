@@ -7,7 +7,7 @@
 
 class Map {
 public:
-	Map(SDL_Renderer* Ren, const int& width, const int& height);
+	Map(SDL_Renderer* Ren, const int& width, const int& height, const int& vel);
 	~Map();
 
 	void Update(const int& DeltaTime, Audio* Point);
