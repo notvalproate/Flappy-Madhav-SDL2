@@ -15,21 +15,20 @@ public:
 	~Cat();
 	
 	void Jump();
-	bool Update(const int& DeltaTime, Map* TheMap, bool& DeathDelay);
+	bool Update(const float& DeltaTime, Map* TheMap, bool& DeathDelay);
 	void Render();
 	void ResetCat();
 
 private:
 	CatState State;
-	int CenterY;
-	float CatY;
+	float CenterY, CatY;
 	float Gravity;
 	float Velocity;
-	float KeyFrame, IdleOffset;
+	float KeyFrame;
 	SDL_Texture *CatTex, *DeadCatTex;
 	SDL_Rect DestRect;
 	SDL_Renderer* Renderer;
 
-	void ApplyGravity(const int& DeltaTime);
-	void Idle(const int& DeltaTime);
+	void ApplyGravity(const float& DeltaTime);
+	void Idle(const float& DeltaTime);
 };

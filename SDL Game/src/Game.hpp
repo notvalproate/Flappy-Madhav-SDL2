@@ -18,18 +18,17 @@ public:
 	~Game();
 
 	void Init(const char* title, const char* iconpath, const int& x, const int& y, int width, int height);
-	void HandleEvents(const int& DeltaTime);
-	void Update(const int& DeltaTime); 
+	void HandleEvents();
+	void Update(); 
 	void Render();
 	void Clean();
 	inline bool Exit() { return IsRunning; }
-	inline int GetDelta() { return FrameDelta; }
 	
 private:
 	GameState State;
 	bool IsRunning, DeathDelay;
 	int DelayCount;
-	int FrameDelta;
+	float FrameDelta;
 	int w, h;
 	SDL_Window* Window;
 	SDL_Renderer* Renderer;

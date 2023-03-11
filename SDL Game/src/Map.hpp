@@ -10,7 +10,7 @@ public:
 	Map(SDL_Renderer* Ren, const int& width, const int& height, const int& vel);
 	~Map();
 
-	void Update(const int& DeltaTime, Audio* Point);
+	void Update(const float& DeltaTime, Audio* Point);
 	void Render();
 	void ResetMap();
 	bool CheckCollision(const int& catx, const int& caty, const int& catw, const int& cath);

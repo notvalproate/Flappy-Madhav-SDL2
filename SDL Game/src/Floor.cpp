@@ -8,27 +8,17 @@ Floor::Floor(const char* texturepath, SDL_Renderer* Ren, const int& width, const
 	//Load floor's texture
 	FloorTex = Texture::LoadTexture(texturepath, Ren);
 
-	//Set the Source rectangle for the floor
+	//Set the Destination Rectangle for both first and second half of floor
 	SDL_Point size;
 	SDL_QueryTexture(FloorTex, NULL, NULL, &size.x, &size.y);
-	SrcRect.x = 0;
-	SrcRect.y = 0;
-	SrcRect.w = size.x;
-	SrcRect.h = 10;
 
-	//Set the Destination Rectangle for both first and second half of floor
-	FirstHalf.y = (height * 9) / 10;
-	FirstHalf.w = width;
-	FirstHalf.h = height / 10;
+	DestRect.y = (height * 9) / 10;
+	DestRect.w = 2 * width;
+	DestRect.h = height / 10;
 
-	//Second half is placed outside the screen, just to the right of first half
-	SecondHalf.y = FirstHalf.y;
-	SecondHalf.w = FirstHalf.w;
-	SecondHalf.h = FirstHalf.h;
-
-	Position = 0; //Keeps track of floor's position in float
-
-	ResetFloor();
+	//Set Floor postions;
+	FloorX = 0;
+	DestRect.x = 0;
 
 	Velocity = vel; //Velocity at which the map will move towards the left;
 }
@@ -39,24 +29,20 @@ Floor::~Floor() {
 
 void Floor::ResetFloor() {
 	//Reset the floor, first half to the screen and second half on the right of it;
-	Position = 0;
-	FirstHalf.x = 0;
-	SecondHalf.x = FirstHalf.w;
+	FloorX += DestRect.w / 2;
+	DestRect.x = std::round(FloorX);
 }
 
-void Floor::Update(const int& DeltaTime) {
-	Position -= (Velocity * DeltaTime) / static_cast <float> (1000); //Move the floor's position to the left based on velocity
-	//Set the position to first half and second half
-	FirstHalf.x = std::round(Position);
-	SecondHalf.x = std::round(Position) + FirstHalf.w;
+void Floor::Update(const float& DeltaTime) {
+	FloorX -= (Velocity * DeltaTime) / static_cast <float> (1000);
+	DestRect.x = std::round(FloorX);  //Move the floor's position to the left based on velocity
 
 	//If second half reaches the left of the screen (No more floor to show on the right), reset the floor's position
-	if (SecondHalf.x <= 0) {
+	if (DestRect.x + (DestRect.w / 2) <= 0) {
 		ResetFloor();
 	}
 }
 
 void Floor::Render() {
-	SDL_RenderCopy(Renderer, FloorTex, &SrcRect, &FirstHalf);
-	SDL_RenderCopy(Renderer, FloorTex, &SrcRect, &SecondHalf);
+	SDL_RenderCopy(Renderer, FloorTex, NULL, &DestRect);
 }

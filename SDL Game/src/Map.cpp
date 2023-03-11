@@ -24,7 +24,7 @@ Map::~Map() {
 	free(P[3]);
 }
 
-void Map::Update(const int& DeltaTime, Audio* Point) {
+void Map::Update(const float& DeltaTime, Audio* Point) {
 	//Update every pipe's position
 	for (int i = 0; i < 4; i++) {
 		if (P[i]->Update(DeltaTime)) { //Update() returns true if the pipe passed the screen's halfway mark (Increment the Score)

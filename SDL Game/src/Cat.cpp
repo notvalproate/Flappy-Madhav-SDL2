@@ -14,9 +14,8 @@ Cat::Cat(SDL_Renderer* Ren, const int& width, const int& height) {
 	CenterY = height / 2;
 	DestRect.x = width / 2 - (DestRect.w / 2);
 	DestRect.y = CenterY - (DestRect.h / 2);
-	CatY = DestRect.y; //CatY keeps track of cat's position as a FLOAT value.
+	CatY = DestRect.y;
 	
-	IdleOffset = 0;
 	Velocity = 0;
 	Gravity = DestRect.h * 45; //Gravity that the cat will experience
 	KeyFrame = 0; //Argument for the SIN function for IDLE animation
@@ -31,8 +30,8 @@ Cat::~Cat() {
 
 void Cat::ResetCat() {
 	//Reset Cat's Y position to centre of the screen, and set state to ready.
-	CatY = CenterY - (DestRect.h / 2);
-	DestRect.y = CatY;
+	DestRect.y = CenterY - (DestRect.h / 2);
+	CatY = DestRect.y;
 	Velocity = 0;
 	KeyFrame = 0;
 	State = Ready;
@@ -43,20 +42,20 @@ void Cat::Jump() {
 		State = Alive;
 	}
 
-	Velocity = DestRect.h * -12.5; //Set the Cat's velocity to a value upwards for simulating a jump
+	Velocity = DestRect.h * -12; //Set the Cat's velocity to a value upwards for simulating a jump
 }
 
-void Cat::ApplyGravity(const int& DeltaTime) {
+void Cat::ApplyGravity(const float& DeltaTime) {
 	Velocity += (Gravity * DeltaTime) / static_cast<float>(1000); //Increase velocity downward based on gravity
 	CatY += (Velocity * DeltaTime) / static_cast <float>(1000); //Move the cat in the direction of that velocity
-	DestRect.y = std::round(CatY); //Round of the Cat's Float Y value to int
+	DestRect.y = std::round(CatY); 
 }
 
-bool Cat::Update(const int& DeltaTime, Map* TheMap,bool& DeathDelay) {	
+bool Cat::Update(const float& DeltaTime, Map* TheMap,bool& DeathDelay) {	
 	switch (State) {
 		case Ready:
 			Idle(DeltaTime); //Play idle animation if cat is Ready
-			break;
+			return false;
 
 		case Alive:
 			//Check for collisions when the cat is alive, CheckCollisions() returns true if collided
@@ -70,9 +69,7 @@ bool Cat::Update(const int& DeltaTime, Map* TheMap,bool& DeathDelay) {
 	}
 
 	//Apply gravity on cat if it is Alive/Dead. Until it goes below the screen,
-	if (State != Ready) {
-		if (CatY <= CenterY * 2) ApplyGravity(DeltaTime);
-	}
+	if (DestRect.y <= CenterY * 2) ApplyGravity(DeltaTime);
 
 	//Return false on default because no collision
 	return false;
@@ -89,11 +86,10 @@ void Cat::Render() {
 	}
 }
 
-void Cat::Idle(const int& DeltaTime) {
-	float x = static_cast<float>(DeltaTime) / static_cast<float>(1000); 
+void Cat::Idle(const float& DeltaTime) {
+	float x = DeltaTime / static_cast<float>(1000); 
 	KeyFrame += x * 5;
 	if (KeyFrame > 6.2831) KeyFrame = 0; //If keyframe value exceeds 2pi, reset it to 0
 
-	IdleOffset = (std::sin(KeyFrame)) * DestRect.h / 6; //Get the cat's offset position from the centerY pos
-	DestRect.y = std::round(CatY + IdleOffset); //Add that offset to the cat's position and round off
+	DestRect.y = CenterY + ((std::sin(KeyFrame)) * DestRect.h / 6); //Add that offset to the cat's position and round off
 }

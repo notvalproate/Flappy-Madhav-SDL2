@@ -20,7 +20,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	}
 	else {
 		std::cout << "Stage: Display Mode Initialized..." << std::endl;
-		FrameDelta = 1000 / Mode.refresh_rate;
+		FrameDelta = (float) 1000 / (float) Mode.refresh_rate;
 		//Set minimum frame-time to 1000 / refresh rate of the user's monitor.
 	}
 
@@ -39,7 +39,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	std::cout << "Stage: Initialized Window..." << std::endl;
 
 	//Create an SDL Renderer
-	if (!(Renderer = SDL_CreateRenderer(Window, -1, 0))) {
+	if (!(Renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_PRESENTVSYNC))) {
 		std::cout << "Error: Couldn't Initialize Renderer..." << std::endl;
 		return;
 	}
@@ -127,7 +127,7 @@ void Game::TogglePause() {
 	}
 }
 
-void Game::HandleEvents(const int& DeltaTime) {
+void Game::HandleEvents() {
 	SDL_PollEvent(&Event); //Poll Events
 
 	if (!DeathDelay || (DelayCount > 500)) { //Check for event only if it has been 500ms since death, hence "DeathDelay"
@@ -140,7 +140,10 @@ void Game::HandleEvents(const int& DeltaTime) {
 				break;
 			case SDL_KEYDOWN:
 				switch (Event.key.keysym.sym) {
-					case SDLK_SPACE | SDLK_UP:
+					case SDLK_UP:
+						JumpCat();
+						break;
+					case SDLK_SPACE:
 						JumpCat();
 						break;
 					case SDLK_ESCAPE: //Toggle Pause if ESC
@@ -153,18 +156,18 @@ void Game::HandleEvents(const int& DeltaTime) {
 		DelayCount = 0;
 	}
 	else {
-		DelayCount += DeltaTime; //If it hasnt been 500ms, continue counting the time since last death
+		DelayCount += FrameDelta; //If it hasnt been 500ms, continue counting the time since last death
 	}
 }
 
-void Game::Update(const int& DeltaTime) {
+void Game::Update() {
 	if (State == InGame) {
-		TheMap->Update(DeltaTime, Point); //Map is only updated/moving in InGame state
+		TheMap->Update(FrameDelta, Point); //Map is only updated/moving in InGame state
 	}
 
 	//Since the Cat is always updated except when paused:
 	if (State != Pause) {
-		if (Catto->Update(DeltaTime, TheMap, DeathDelay)) { //Check if cat dies, Catto->Update() returns true if cat dies.
+		if (Catto->Update(FrameDelta, TheMap, DeathDelay)) { //Check if cat dies, Catto->Update() returns true if cat dies.
 			BGM->StopMusic();
 			Death->PlaySound();
 			State = DeathScreen; //Stop music and play death sound, and state to deathscreen
@@ -196,7 +199,9 @@ void Game::Render() {
 	SDL_RenderPresent(Renderer); 
 
 	if (!InFocus()) {
+		BGM->PauseMusic();
 		SDL_WaitEvent(NULL); //If Window not in focus, do not render and wait for window to come in focus.
+		BGM->ResumeMusic();
 	}
 }
 
