@@ -42,6 +42,9 @@
     <ClCompile Include="src\Audio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />
@@ -76,6 +79,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -117,6 +123,12 @@
       <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="assets\textures\star.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="assets\textures\ui.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="assets\textures\shadow.png">
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>

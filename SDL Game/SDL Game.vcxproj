@@ -148,6 +148,7 @@
     <ClCompile Include="src\Pipe.cpp" />
     <ClCompile Include="src\Score.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\UI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\hs.dat" />
@@ -166,6 +167,7 @@
     <ClInclude Include="src\Pipe.hpp" />
     <ClInclude Include="src\Score.hpp" />
     <ClInclude Include="src\Texture.hpp" />
+    <ClInclude Include="src\UI.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\background.png" />
@@ -178,8 +180,10 @@
     <Image Include="assets\textures\numbers.png" />
     <Image Include="assets\textures\pause.png" />
     <Image Include="assets\textures\ready.png" />
+    <Image Include="assets\textures\shadow.png" />
     <Image Include="assets\textures\star.png" />
     <Image Include="assets\textures\top_pipe.png" />
+    <Image Include="assets\textures\ui.png" />
     <Image Include="icon1.ico" />
   </ItemGroup>
   <ItemGroup>

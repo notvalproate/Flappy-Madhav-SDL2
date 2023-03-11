@@ -52,8 +52,15 @@ void Score::GetDigits() {
 	//Clears the Digits vector and gets each digit of Count
 	int k = 1, i;
 	Digits.clear();
-	//added || Count == 0 because first condition eleminates that case, but we still want the value 0 to be pushed back
-	while (Count / k != 0 || Count == 0) {
+
+	//If zero
+	if (Count == 0) {
+		Digits.push_back(0);
+		return;
+	}
+
+	//Add digits iteratively
+	while (Count / k != 0) {
 		i = (Count / k) % 10;
 		Digits.push_back(i);
 		k *= 10;

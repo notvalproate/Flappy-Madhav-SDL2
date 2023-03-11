@@ -2,7 +2,7 @@
 #include "SDL_mixer.h"
 #include <iostream>
 
-Game::Game() : IsRunning(false), FrameDelta(16), Window(nullptr), Renderer(nullptr), DeathDelay(false), DelayCount(0), State(Menu) { }
+Game::Game() : IsRunning(false), FrameDelta(16), Window(nullptr), Renderer(nullptr), DeathDelay(false), DelayCount(0), State(ReadyScreen) { }
  
 Game::~Game() { }
 
@@ -33,6 +33,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 		std::cout << "Error: Couldn't Initialize Window..." << std::endl;
 		return;
 	}
+
 	SDL_Surface* TempSurface = IMG_Load(iconpath);
 	SDL_SetWindowIcon(Window, TempSurface); //Setting window icon
 	SDL_FreeSurface(TempSurface);
@@ -91,11 +92,14 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	Death = new Audio("assets/audio/death.wav", 50, -1);
 	Point = new Audio("assets/audio/point.wav", 20, 0);
 	BGM = new Music("assets/audio/bgm.mp3", 60);
+
+	//Menu UI
+	MenuScreen = new UI("assets/textures/ui.png", Renderer, w, h);
 }
 
 void Game::JumpCat() {
 	//Jump function also used to start the game
-	if (State == Menu) {
+	if (State == ReadyScreen) {
 		BGM->PlayMusic();
 		State = InGame;
 	}
@@ -107,9 +111,9 @@ void Game::JumpCat() {
 			Jump->PlaySound();
 			break;
 		case DeathScreen:
-			Catto->ResetCat();	//Reset Map and Cat if currently on GameOver screen, and change state to Menu
+			Catto->ResetCat();	//Reset Map and Cat if currently on GameOver screen, and change state to ready
 			TheMap->ResetMap();
-			State = Menu;
+			State = ReadyScreen;
 			break;
 	}
 }
@@ -127,6 +131,54 @@ void Game::TogglePause() {
 	}
 }
 
+void Game::HandleClick() {
+	switch (State) {
+	case ReadyScreen:
+		if (MenuScreen->CheckClick()) {
+			State = Menu;
+		}
+		else {
+			JumpCat();
+		}
+		break;
+
+	case Menu:
+		if (!MenuScreen->CheckClick()) {
+			State = ReadyScreen;
+		}
+		break;
+
+	default:
+		JumpCat();
+		break;
+	}
+}
+
+void Game::HandleKey(SDL_KeyboardEvent& Event) {
+	switch (Event.keysym.sym) {
+	case SDLK_UP:
+		JumpCat();
+		break;
+
+	case SDLK_SPACE:
+		JumpCat();
+		break;
+
+	case SDLK_ESCAPE: //Toggle Pause if ESC
+		TogglePause();
+		break;
+
+	case SDLK_F11:
+		if (!(SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) {
+			SDL_SetWindowFullscreen(Window, SDL_WINDOW_FULLSCREEN);
+			break;
+		}
+		SDL_SetWindowFullscreen(Window, 0);
+		SDL_SetWindowSize(Window, 1280, 720);
+		break;
+	}
+}
+
 void Game::HandleEvents() {
 	SDL_PollEvent(&Event); //Poll Events
 
@@ -136,20 +188,10 @@ void Game::HandleEvents() {
 				IsRunning = false; //Quit game loop
 				break;
 			case SDL_MOUSEBUTTONDOWN: //Jump the cat for all, click, space, and up arrow key
-				JumpCat(); 
+				HandleClick();
 				break;
 			case SDL_KEYDOWN:
-				switch (Event.key.keysym.sym) {
-					case SDLK_UP:
-						JumpCat();
-						break;
-					case SDLK_SPACE:
-						JumpCat();
-						break;
-					case SDLK_ESCAPE: //Toggle Pause if ESC
-						TogglePause();
-						break;
-				}
+				HandleKey(Event.key);
 				break;
 		}
 		DeathDelay = false; // Remove the Delay condition and reset the DelayCount
@@ -185,8 +227,12 @@ void Game::Render() {
 
 	//Check state to render ui textures
 	switch (State) {
+		case ReadyScreen:
+			SDL_RenderCopy(Renderer, Titles[0], NULL, &TitleRect[0]); //Get Ready texture if Ready
+			MenuScreen->RenderUI();
+			break;
 		case Menu:
-			SDL_RenderCopy(Renderer, Titles[0], NULL, &TitleRect[0]); //Get Ready texture if in menu
+			MenuScreen->RenderUI();
 			break;
 		case Pause:
 			SDL_RenderCopy(Renderer, Titles[2], NULL, &TitleRect[2]); //Pause Button texture if paused

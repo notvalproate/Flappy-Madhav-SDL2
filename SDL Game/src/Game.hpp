@@ -4,9 +4,11 @@
 #include "Map.hpp"
 #include "Texture.hpp"
 #include "Audio.hpp"
+#include "UI.hpp"
 
 enum GameState {
 	Menu,
+	ReadyScreen,
 	InGame,
 	Pause,
 	DeathScreen
@@ -41,8 +43,11 @@ private:
 	Map* TheMap;
 	Audio *Jump, *Death, *Point;
 	Music *BGM;
+	UI *MenuScreen;
 
 	bool InFocus();
 	void JumpCat();
 	void TogglePause();
+	void HandleClick();
+	void HandleKey(SDL_KeyboardEvent& Event);
 };
