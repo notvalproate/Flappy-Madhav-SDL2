@@ -17,6 +17,7 @@ Cat::Cat(SDL_Renderer* Ren, const int& width, const int& height) {
 	CatY = DestRect.y;
 	
 	Velocity = 0;
+	VelFac = -12;
 	Gravity = DestRect.h * 45; //Gravity that the cat will experience
 	KeyFrame = 0; //Argument for the SIN function for IDLE animation
 
@@ -42,8 +43,21 @@ void Cat::Jump() {
 		State = Alive;
 	}
 
-	Velocity = DestRect.h * -12; //Set the Cat's velocity to a value upwards for simulating a jump
+	Velocity = DestRect.h * VelFac; //Set the Cat's velocity to a value upwards for simulating a jump
 }
+
+void Cat::SetMode(const GameMode& mode) {
+	Mode = mode;
+	switch (Mode) {
+	case Normal:
+		VelFac = -12;
+		break;
+	case Speedy:
+		VelFac = -9.5;
+		break;
+	}
+}
+
 
 void Cat::ApplyGravity(const float& DeltaTime) {
 	Velocity += (Gravity * DeltaTime) / static_cast<float>(1000); //Increase velocity downward based on gravity

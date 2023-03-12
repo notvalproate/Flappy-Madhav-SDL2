@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL.h"
 #include <vector>
+#include "GameModes.hpp"
 
 class Score {
 public:
@@ -30,8 +31,10 @@ public:
 
 	void Render();
 	void Write();
+	void SetMode(const GameMode& mode);
 
 private:
 	void Read();
 	SDL_Texture* StarTex;
+	GameMode Mode;
 };

@@ -40,7 +40,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	std::cout << "Stage: Initialized Window..." << std::endl;
 
 	//Create an SDL Renderer
-	if (!(Renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_PRESENTVSYNC))) {
+	if (!(Renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED))) {
 		std::cout << "Error: Couldn't Initialize Renderer..." << std::endl;
 		return;
 	}
@@ -54,8 +54,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	Catto = new Cat(Renderer, w, h);
 
 	//Set Speed of map moving to right and pass it to map object
-	int MapVelocity = w / 4.5;
-	TheMap = new Map(Renderer, w, h, MapVelocity);
+	TheMap = new Map(Renderer, w, h, w / 4.5, w / 2);
 
 	SDL_Point Size; // Point to get dimensions of texture to get it's height / width ratio
 	Titles[0] = Texture::LoadTexture("assets/textures/ready.png", Renderer); //Get Ready Texture
@@ -94,7 +93,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	BGM = new Music("assets/audio/bgm.mp3", 60);
 
 	//Menu UI
-	MenuScreen = new UI("assets/textures/ui.png", Renderer, w, h);
+	MenuScreen = new UI("assets/textures/ui.png", "assets/audio/option.wav", Renderer, w, h, TheMap, Catto);
 }
 
 void Game::JumpCat() {

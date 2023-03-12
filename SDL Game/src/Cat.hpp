@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include "Texture.hpp"
 #include "Map.hpp"
+#include "GameModes.hpp"
 
 enum CatState {
 	Ready,
@@ -18,12 +19,14 @@ public:
 	bool Update(const float& DeltaTime, Map* TheMap, bool& DeathDelay);
 	void Render();
 	void ResetCat();
+	void SetMode(const GameMode& mode);
 
 private:
 	CatState State;
+	GameMode Mode;
 	float CenterY, CatY;
 	float Gravity;
-	float Velocity;
+	float Velocity, VelFac;
 	float KeyFrame;
 	SDL_Texture *CatTex, *DeadCatTex;
 	SDL_Rect DestRect;

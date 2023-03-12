@@ -1,41 +1,61 @@
 #include "UI.hpp"
 #include "Texture.hpp"
 #include <iostream>
+#include <cmath>
+#include "GameModes.hpp"
 
 UIComponent::UIComponent(const SDL_Rect& Src, const SDL_Rect& Dest) {
 	Selected = false;
 	SrcRect = Src;
 	DestRect = Dest;
+	Original = Dest;
 }
 
 UIComponent::~UIComponent() { }
 
 bool UIComponent::CheckClick() {
-	int x, y;
-	SDL_GetMouseState(&x, &y);
-
-	if (
-		x >= DestRect.x &&
-		x <= DestRect.x + DestRect.w &&
-		y >= DestRect.y &&
-		y <= DestRect.y + DestRect.h
-		) {
+	SDL_Point P;
+	SDL_GetMouseState(&P.x, &P.y);
+	
+	if (SDL_PointInRect(&P, &DestRect)) {
 		return true;
 	}
 
 	return false;
 }
 
+void UIComponent::ScaleAboutCenter(const float& factor) {
+	DestRect.x -= std::round(((factor - 1) * DestRect.w) / (float) 2);
+	DestRect.y -= std::round(((factor - 1) * DestRect.h) / (float) 2);
+	DestRect.w = std::round(factor * DestRect.w);
+	DestRect.h = std::round(factor * DestRect.h);
+}
+
+void UIComponent::ResetScale() {
+	DestRect = Original;
+}
+
+void UIComponent::ToggleSelect() {
+	if (!Selected) {
+		Selected = true;
+		return;
+	}
+	Selected = false;
+}
+
 void UIComponent::RenderComponent(SDL_Renderer* Ren, SDL_Texture* Tex) {
 	SDL_RenderCopy(Ren, Tex, &SrcRect, &DestRect);
 }
 
-UI::UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& height) {
+UI::UI(const char* texpath, const char* audiopath, SDL_Renderer* ren, const int& width, const int& height, Map* map, Cat* cat) {
 	//Initialize state as closed and load texture
 	Open = false;
 	Renderer = ren;
 	UITex = Texture::LoadTexture(texpath, ren);
 	Shadow = Texture::LoadTexture("assets/textures/shadow.png", ren);
+	TheMap = map;
+	TheCat = cat;
+	Click = new Audio(audiopath, 50, 3);
 
 	//Initialize Components
 	SDL_Rect Src, Dest;
@@ -72,6 +92,8 @@ UI::UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& heig
 	Dest.y = (height / 2) - (Dest.w * 3) / 20;
 
 	NMode = new UIComponent(Src, Dest);
+	NMode->ScaleAboutCenter(1.3);
+	NMode->ToggleSelect();
 
 	Src.x += Src.w;
 	Dest.x = ((2 * width) / 3) - Dest.w - (width / 18);
@@ -85,16 +107,29 @@ UI::~UI() {
 
 bool UI::CheckClick() {
 	if (!Open && Settings->CheckClick()) {
+		Click->PlaySound();
 		Open = true;
 		return true;
 	}
 
 	if (Open && Menu->CheckClick()) {
-		if (NMode->CheckClick()) {
-			std::cout << "Pressed NMODE";
+		if (!NMode->Selected && NMode->CheckClick()) {
+			Click->PlaySound();
+			NMode->ScaleAboutCenter(1.3);
+			SMode->ResetScale();
+			NMode->Selected = true;
+			SMode->Selected = false;
+			TheMap->SetMode(Normal);
+			TheCat->SetMode(Normal);
 		}
-		if (SMode->CheckClick()) {
-			std::cout << "Pressed SMOD";
+		if (!SMode->Selected && SMode->CheckClick()) {
+			Click->PlaySound();
+			SMode->ScaleAboutCenter(1.3);
+			NMode->ResetScale();
+			NMode->Selected = false;
+			SMode->Selected = true;
+			TheMap->SetMode(Speedy);
+			TheCat->SetMode(Speedy);
 		}
 		return true;
 	}

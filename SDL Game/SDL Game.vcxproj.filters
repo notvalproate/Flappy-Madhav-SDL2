@@ -52,6 +52,8 @@
     <None Include="SDL2_mixer.dll" />
     <None Include="SDL Game.aps" />
     <None Include="assets\hs.dat" />
+    <None Include="assets\hs1.dat" />
+    <None Include="assets\hs2.dat" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game.hpp">
@@ -82,6 +84,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="src\UI.hpp">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameModes.hpp">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -143,6 +148,9 @@
       <Filter>リソース ファイル</Filter>
     </Media>
     <Media Include="assets\audio\bgm.mp3" />
+    <Media Include="assets\audio\option.wav">
+      <Filter>リソース ファイル</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SDL Game.rc">

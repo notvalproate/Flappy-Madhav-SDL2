@@ -4,12 +4,17 @@
 #include <iostream>
 #include <random>
 
-Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const int& width, const int& height, const int& offset, const int& vel) {
+Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const int& width, const int& height, const int& offset, const int& veln, const int& vels, const int& previousy) {
 	Renderer = Ren;
 	//Load Top and bottom pipe textures
 	TopTex = Texture::LoadTexture(toptex, Renderer);
 	BottomTex = Texture::LoadTexture(bottomtex, Renderer);
-	Velocity = vel;
+	
+	CurrVel = veln;
+	VelocityN = veln;
+	VelocityS = vels;
+	Mode = Normal;
+
 	//Set state as not yet passed middle of screen
 	passed = false;
 
@@ -27,7 +32,7 @@ Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const i
 	Bottom.w = Top.w;
 	Bottom.h = (int) (Bottom.w * ((float) BottomSize.y / (float)BottomSize.x));
 	
-	SetPipeGap(offset); //Function to set the gap between the pipe at random height
+	SetPipeGap(offset, previousy); //Function to set the gap between the pipe at random height
 }
 
 Pipe::~Pipe() {
@@ -35,16 +40,16 @@ Pipe::~Pipe() {
 	SDL_DestroyTexture(BottomTex);
 }
 
-bool Pipe::Update(const float& DeltaTime) {
+bool Pipe::Update(const float& DeltaTime, const int& previousy) {
 	//Calculate how much distance pipe has moved left and Set the top and bottom pipes to same distance
-	PipeX -= (Velocity * DeltaTime) / static_cast <float> (1000);
+	PipeX -= (CurrVel * DeltaTime) / static_cast <float> (1000);
 	Top.x = std::round(PipeX);
 	Bottom.x = std::round(PipeX);
 
 	//If pipe exits screen on right, reset it
 	if (Top.x + Top.w <= 0) {
 		passed = false;
-		SetPipeGap(0); //Passing offset as 0 resets the pipe just to the right of the screen
+		SetPipeGap(0, previousy); //Passing offset as 0 resets the pipe just to the right of the screen
 	}
 
 	//Check if pipe passes the scoreline
@@ -62,10 +67,25 @@ void Pipe::Render() {
 	SDL_RenderCopy(Renderer, BottomTex, NULL, &Bottom);
 }
 
-void Pipe::ResetPipe(const int& offset) {
+void Pipe::ResetPipe(const int& offset, const int& previousy) {
 	//Reset all the pipes
 	passed = false;
-	SetPipeGap(offset);
+	SetPipeGap(offset, previousy);
+}
+
+void Pipe::SetMode(const GameMode& mode, const int& offset, const int& previousy) {
+	Mode = mode;
+
+	switch (Mode) {
+	case Normal:
+		SetPipeGap(offset, previousy);
+		CurrVel = VelocityN;
+		break;
+	case Speedy:
+		SetPipeGap(offset, previousy);
+		CurrVel = VelocityS;
+		break;
+	}
 }
 
 bool Pipe::CheckCollision(const int& catx, const int& caty, const int& catw, const int& cath) {
@@ -86,14 +106,28 @@ bool Pipe::CheckCollision(const int& catx, const int& caty, const int& catw, con
 	return false;
 }
 
-void Pipe::SetPipeGap(const int& offset) {
+void Pipe::SetPipeGap(const int& offset, const int& previousy) {
 	//Generate a random number between 0 to 8
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> dist(0, 8);
 
-	//Minimum height from top is 1/10th of screen height, then + random multiple of ScreenHeight / 18
-	int bottom = (ScreenH / 10) + (dist(gen) * (ScreenH / 18));
+	//Minimum height from top is 1/10th of screen height, then + random multiple of ScreenHeight / 18 - NORMAL
+	//Otherwise input y value of previous pipe, and offset it by a bit - SPEEDY
+	int bottom = 0;
+	std::uniform_int_distribution<int> dists(-2, 2);
+	std::uniform_int_distribution<int> distn(0, 8);
+
+	switch (Mode) {
+	case Normal:
+		bottom = (ScreenH / 10) + (distn(gen) * (ScreenH / 18));
+		break;
+	case Speedy:
+		bottom = previousy + (dists(gen) * (ScreenH / 20));
+		if (bottom < ScreenH / 10) bottom = ScreenH / 10;
+		else if (bottom >= (5 * ScreenH) / 9) bottom = (5 * ScreenH) / 9;
+		break;
+	}
+
 	Top.y = bottom - Top.h;
 	Bottom.y = bottom + (ScreenW / 8);
 

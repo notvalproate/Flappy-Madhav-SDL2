@@ -152,6 +152,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\hs.dat" />
+    <None Include="assets\hs1.dat" />
+    <None Include="assets\hs2.dat" />
     <None Include="SDL Game.aps" />
     <None Include="SDL2.dll" />
     <None Include="SDL2_image.dll" />
@@ -163,6 +165,7 @@
     <ClInclude Include="src\Cat.hpp" />
     <ClInclude Include="src\Floor.hpp" />
     <ClInclude Include="src\Game.hpp" />
+    <ClInclude Include="src\GameModes.hpp" />
     <ClInclude Include="src\Map.hpp" />
     <ClInclude Include="src\Pipe.hpp" />
     <ClInclude Include="src\Score.hpp" />
@@ -190,6 +193,7 @@
     <Media Include="assets\audio\bgm.mp3" />
     <Media Include="assets\audio\death.wav" />
     <Media Include="assets\audio\jump.wav" />
+    <Media Include="assets\audio\option.wav" />
     <Media Include="assets\audio\point.wav" />
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,7 @@
 #include "Texture.hpp"
 #include <iostream>
 #include <fstream>
+#include <string>
 
 Score::Score() { }
 
@@ -95,6 +96,8 @@ HighScore::HighScore(const char* texpath, const char* startex, SDL_Renderer* Ren
 	DestRect.h = height / 10; 
 	ResetX = DestRect.x;
 
+	Mode = Normal;
+
 	Read();
 	Renderer = Ren;
 	NumTex = Texture::LoadTexture(texpath, Ren);
@@ -128,7 +131,10 @@ void HighScore::Render() {
 
 void HighScore::Read() {
 	long long hs;
-	std::ifstream os("assets/hs.dat", std::ios::binary);
+	std::string path = "assets/hs1.dat";
+	if (Mode == Speedy) path = "assets/hs2.dat";
+
+	std::ifstream os(path, std::ios::binary);
 	os.read((char*)&hs, sizeof(hs));
 	os.close();
 	Count = hs - 4782423574423854;
@@ -137,8 +143,16 @@ void HighScore::Read() {
 }
 
 void HighScore::Write() {
+	std::string path = "assets/hs1.dat";
+	if (Mode == Speedy) path = "assets/hs2.dat";
+
 	long long hs = Count + 4782423574423854;
-	std::ofstream os("assets/hs.dat", std::ios::binary);
+	std::ofstream os(path, std::ios::binary);
 	os.write((char*)&hs, sizeof(hs));
 	os.close();
+}
+
+void HighScore::SetMode(const GameMode& mode) {
+	Mode = mode;
+	Read();
 }
