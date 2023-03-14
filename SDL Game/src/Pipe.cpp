@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <random>
+#include <algorithm>
 
 Pipe::Pipe(const char* toptex, const char* bottomtex, SDL_Renderer* Ren, const int& width, const int& height, const int& offset, const int& veln, const int& vels, const int& previousy) {
 	Renderer = Ren;
@@ -75,7 +76,7 @@ void Pipe::ResetPipe(const int& offset, const int& previousy) {
 
 void Pipe::SetMode(const GameMode& mode, const int& offset, const int& previousy) {
 	Mode = mode;
-
+	//Change the velocity based on the mode, and reset the pipe gap for each of them
 	switch (Mode) {
 	case Normal:
 		SetPipeGap(offset, previousy);
@@ -123,11 +124,11 @@ void Pipe::SetPipeGap(const int& offset, const int& previousy) {
 		break;
 	case Speedy:
 		bottom = previousy + (dists(gen) * (ScreenH / 20));
-		if (bottom < ScreenH / 10) bottom = ScreenH / 10;
-		else if (bottom >= (5 * ScreenH) / 9) bottom = (5 * ScreenH) / 9;
+		bottom = std::max(ScreenH / 10, std::min((5 * ScreenH) / 9, bottom)); //Clamp the value between h/10 and 5h/9
 		break;
 	}
 
+	//Set y value of the rectangles top left corners
 	Top.y = bottom - Top.h;
 	Bottom.y = bottom + (ScreenW / 8);
 

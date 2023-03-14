@@ -147,6 +147,7 @@
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\Pipe.cpp" />
     <ClCompile Include="src\Score.cpp" />
+    <ClCompile Include="src\Slider.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\UI.cpp" />
   </ItemGroup>
@@ -169,6 +170,7 @@
     <ClInclude Include="src\Map.hpp" />
     <ClInclude Include="src\Pipe.hpp" />
     <ClInclude Include="src\Score.hpp" />
+    <ClInclude Include="src\Slider.hpp" />
     <ClInclude Include="src\Texture.hpp" />
     <ClInclude Include="src\UI.hpp" />
   </ItemGroup>

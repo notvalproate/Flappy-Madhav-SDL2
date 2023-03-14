@@ -131,23 +131,20 @@ void HighScore::Render() {
 
 void HighScore::Read() {
 	long long hs;
-	std::string path = "assets/hs1.dat";
-	if (Mode == Speedy) path = "assets/hs2.dat";
+	std::ifstream os("assets/hs.dat", std::ios::binary);
 
-	std::ifstream os(path, std::ios::binary);
+	if (Mode == Speedy) os.seekg(sizeof(hs), std::ios::beg);
 	os.read((char*)&hs, sizeof(hs));
 	os.close();
 	Count = hs - 4782423574423854;
-
 	GetDigits();
 }
 
 void HighScore::Write() {
-	std::string path = "assets/hs1.dat";
-	if (Mode == Speedy) path = "assets/hs2.dat";
-
 	long long hs = Count + 4782423574423854;
-	std::ofstream os(path, std::ios::binary);
+	std::ofstream os("assets/hs.dat", std::ios::binary | std::ios::in | std::ios::out);
+
+	if (Mode == Speedy) os.seekp(sizeof(hs), std::ios::beg);
 	os.write((char*)&hs, sizeof(hs));
 	os.close();
 }

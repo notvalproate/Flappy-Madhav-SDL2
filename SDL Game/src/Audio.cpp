@@ -12,6 +12,10 @@ Audio::~Audio() {
 	Mix_FreeChunk(Sound);
 }
 
+void Audio::SetVolume(int vol) {
+	Volume = vol;
+}
+
 void Audio::PlaySound() {
 	//Set Volume of the channel and play
 	Mix_Volume(Channel, Volume);
@@ -29,10 +33,15 @@ Music::~Music() {
 	Mix_FreeMusic(Song);
 }
 
+void Music::SetVolume(int vol) {
+	Volume = vol;
+	Mix_VolumeMusic(Volume);
+}
+
 void Music::PlayMusic() {
 	//If another music object is playing, halt it and play this one.
 	if (Mix_PlayingMusic()) {
-		Mix_HaltMusic();
+		return;
 	}
 
 	Mix_VolumeMusic(Volume);

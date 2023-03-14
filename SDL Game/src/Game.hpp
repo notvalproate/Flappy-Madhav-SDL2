@@ -23,6 +23,7 @@ public:
 	void HandleEvents();
 	void Update(); 
 	void Render();
+	void GameEvents(const SDL_Event& Event);
 	void Clean();
 	inline bool Exit() { return IsRunning; }
 	
@@ -41,13 +42,10 @@ private:
 	SDL_Rect TitleRect[3];
 	Cat* Catto;
 	Map* TheMap;
-	Audio *Jump, *Death, *Point;
+	Audio *Jump, *Death, *Point, *Click;
 	Music *BGM;
 	UI *MenuScreen;
 
 	bool InFocus();
-	void JumpCat();
 	void TogglePause();
-	void HandleClick();
-	void HandleKey(SDL_KeyboardEvent& Event);
 };

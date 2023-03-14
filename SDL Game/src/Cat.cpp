@@ -29,6 +29,31 @@ Cat::~Cat() {
 	SDL_DestroyTexture(DeadCatTex);
 }
 
+bool Cat::HandleEvents(const SDL_Event& Event) {
+	bool EventOccured = false;
+
+	switch (Event.type) {
+	case SDL_MOUSEBUTTONDOWN:
+		EventOccured = true;
+	case SDL_KEYDOWN:
+		switch (Event.key.keysym.sym) {
+		case SDLK_SPACE: case SDLK_UP:
+			EventOccured = true;
+		}
+	}
+
+	if (EventOccured) {
+		if (State != Dead) {
+			Jump();
+		}
+		else {
+			ResetCat();
+		}
+	}
+
+	return EventOccured;
+}
+
 void Cat::ResetCat() {
 	//Reset Cat's Y position to centre of the screen, and set state to ready.
 	DestRect.y = CenterY - (DestRect.h / 2);

@@ -7,6 +7,7 @@ public:
 	~Audio();
 
 	void PlaySound();
+	void SetVolume(int vol);
 private:
 	Mix_Chunk* Sound;
 	int Volume, Channel;
@@ -17,6 +18,7 @@ public:
 	Music(const char* path, int vol);
 	~Music();
 
+	void SetVolume(int vol);
 	void PlayMusic();
 	void StopMusic();
 	void PauseMusic();

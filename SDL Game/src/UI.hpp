@@ -4,6 +4,15 @@
 #include "Map.hpp"
 #include "Cat.hpp"
 #include "Audio.hpp"
+#include "Slider.hpp"
+
+enum ComponentState {
+	Unselected,
+	AnimateIn,
+	AnimateOut,
+	Selected,
+	NoSelection
+};
 
 class UIComponent {
 public:
@@ -13,29 +22,36 @@ private:
 	~UIComponent();
 
 	bool CheckClick();
-	void ToggleSelect();
 	void RenderComponent(SDL_Renderer* Ren, SDL_Texture* Tex);
 	void ScaleAboutCenter(const float& factor);
-	void ResetScale();
+	void Update(const int& DeltaTime);
+	void UnSelect();
+	bool IsSelected() { if (State == Selected) return true; return false; }
 
-	bool Selected;
+	int KeyFrame, AnimLength;
 	SDL_Rect SrcRect, DestRect, Original;
+	ComponentState State;
 };
 
 class UI {
 public:
-	UI(const char* texpath, const char* audiopath, SDL_Renderer* ren, const int& width, const int& height, Map* map, Cat* cat);
+	UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& height, Map* map, Cat* cat);
 	~UI();
-
-	bool CheckClick();
+	
+	bool HandleEvents(const SDL_Event& event, Audio* Click, Music* BGM);
 	void RenderUI();
+	void Update(const int& DeltaTime);
+	int GetSFXVol();
+	int GetMusicVol();
 
 private:
 	bool Open;
 	UIComponent *Settings, *Menu, *NMode, *SMode;
+	Slider* SFXSlider , * MusicSlider;
+
 	SDL_Texture *UITex, *Shadow;
 	SDL_Renderer* Renderer;
-	Audio* Click;
+	
 	Map* TheMap;
 	Cat* TheCat;
 };

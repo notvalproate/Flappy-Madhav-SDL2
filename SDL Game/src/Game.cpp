@@ -80,119 +80,95 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	TitleRect[2].y = (3 * height) / 4;
 
 	//Initialize SDL Mixer
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+	if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 4096) < 0) {
 		std::cout << "Error: Couldn't Initialize Mixer..." << std::endl;
 		return;
 	}
 	std::cout << "Stage: Initialized Mixer..." << std::endl;
 
 	//Audio and Music Objects
-	Jump = new Audio("assets/audio/jump.wav", 30, 1);
+	Jump = new Audio("assets/audio/jump.wav", 50, 1);
 	Death = new Audio("assets/audio/death.wav", 50, -1);
-	Point = new Audio("assets/audio/point.wav", 20, 0);
-	BGM = new Music("assets/audio/bgm.mp3", 60);
+	Point = new Audio("assets/audio/point.wav", 50, 0);
+	BGM = new Music("assets/audio/bgm.mp3", 50);
+	Click = new Audio("assets/audio/option.wav", 50, 3);
 
 	//Menu UI
-	MenuScreen = new UI("assets/textures/ui.png", "assets/audio/option.wav", Renderer, w, h, TheMap, Catto);
-}
-
-void Game::JumpCat() {
-	//Jump function also used to start the game
-	if (State == ReadyScreen) {
-		BGM->PlayMusic();
-		State = InGame;
-	}
-
-	//Check for GameState on Jumping.
-	switch (State) {
-		case InGame:
-			Catto->Jump();	//Jump normally and play sfx if InGame 
-			Jump->PlaySound();
-			break;
-		case DeathScreen:
-			Catto->ResetCat();	//Reset Map and Cat if currently on GameOver screen, and change state to ready
-			TheMap->ResetMap();
-			State = ReadyScreen;
-			break;
-	}
+	MenuScreen = new UI("assets/textures/ui.png", Renderer, w, h, TheMap, Catto);
 }
 
 void Game::TogglePause() {
-	switch (State) {
-		case InGame:
-			BGM->PauseMusic(); //If InGame, Pause game and music
-			State = Pause;
-			break;
-		case Pause:
-			BGM->ResumeMusic(); //Else if Game already Paused, Resume music and state back to InGame
-			State = InGame;
-			break;
+	if(State == InGame) { 
+		State = Pause;
+		BGM->PauseMusic();
+	}
+	else {
+		State = InGame; //Else if Game already Paused, Resume music and state back to InGame
+		BGM->ResumeMusic();
 	}
 }
 
-void Game::HandleClick() {
-	switch (State) {
-	case ReadyScreen:
-		if (MenuScreen->CheckClick()) {
-			State = Menu;
-		}
-		else {
-			JumpCat();
-		}
-		break;
-
-	case Menu:
-		if (!MenuScreen->CheckClick()) {
-			State = ReadyScreen;
-		}
-		break;
-
-	default:
-		JumpCat();
-		break;
+void Game::GameEvents(const SDL_Event& Event) {
+	if (Event.type == SDL_QUIT) {
+		IsRunning = false;
+		return;
 	}
-}
-
-void Game::HandleKey(SDL_KeyboardEvent& Event) {
-	switch (Event.keysym.sym) {
-	case SDLK_UP:
-		JumpCat();
-		break;
-
-	case SDLK_SPACE:
-		JumpCat();
-		break;
-
-	case SDLK_ESCAPE: //Toggle Pause if ESC
-		TogglePause();
-		break;
-
-	case SDLK_F11:
-		if (!(SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) {
-			SDL_SetWindowFullscreen(Window, SDL_WINDOW_FULLSCREEN);
+	if (Event.type == SDL_KEYDOWN) {
+		switch (Event.key.keysym.sym) {
+		case SDLK_ESCAPE:
+			TogglePause();
+			break;
+		case SDLK_F11:
+			if (!(SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) { 
+				SDL_SetWindowFullscreen(Window, SDL_WINDOW_FULLSCREEN); 
+				break;
+			}
+			SDL_SetWindowFullscreen(Window, 0); 
+			SDL_SetWindowSize(Window, 1280, 720); 
 			break;
 		}
-		SDL_SetWindowFullscreen(Window, 0);
-		SDL_SetWindowSize(Window, 1280, 720);
-		break;
 	}
 }
 
 void Game::HandleEvents() {
 	SDL_PollEvent(&Event); //Poll Events
-
 	if (!DeathDelay || (DelayCount > 500)) { //Check for event only if it has been 500ms since death, hence "DeathDelay"
-		switch (Event.type) {
-			case SDL_QUIT:
-				IsRunning = false; //Quit game loop
-				break;
-			case SDL_MOUSEBUTTONDOWN: //Jump the cat for all, click, space, and up arrow key
-				HandleClick();
-				break;
-			case SDL_KEYDOWN:
-				HandleKey(Event.key);
-				break;
+		switch (State) {
+		case Menu:
+			if (!MenuScreen->HandleEvents(Event, Click, BGM)) {
+				State = ReadyScreen;
+			}
+			else {
+				int MusicVol = MenuScreen->GetMusicVol();
+				int SFXVol = MenuScreen->GetSFXVol();
+				Death->SetVolume(SFXVol);
+				Point->SetVolume(SFXVol);
+				Jump->SetVolume(SFXVol);
+				Click->SetVolume(SFXVol);
+				BGM->SetVolume(MusicVol);
+			}
+			break;
+		case ReadyScreen:
+			if (MenuScreen->HandleEvents(Event, Click, BGM)) {
+				State = Menu;
+			}
+			else if(Catto->HandleEvents(Event)) {
+				Jump->PlaySound();
+				BGM->PlayMusic();
+				State = InGame;
+			}
+			break;
+		case InGame:
+			if(Catto->HandleEvents(Event)) Jump->PlaySound();
+			break;
+		case DeathScreen:
+			if (Catto->HandleEvents(Event)) {
+				State = ReadyScreen;
+				TheMap->ResetMap();
+			}
+			break;
 		}
+		GameEvents(Event);
 		DeathDelay = false; // Remove the Delay condition and reset the DelayCount
 		DelayCount = 0;
 	}
@@ -204,6 +180,10 @@ void Game::HandleEvents() {
 void Game::Update() {
 	if (State == InGame) {
 		TheMap->Update(FrameDelta, Point); //Map is only updated/moving in InGame state
+	}
+
+	if (State == Menu) {
+		MenuScreen->Update(FrameDelta);
 	}
 
 	//Since the Cat is always updated except when paused:

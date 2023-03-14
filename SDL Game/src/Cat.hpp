@@ -17,8 +17,8 @@ public:
 	
 	void Jump();
 	bool Update(const float& DeltaTime, Map* TheMap, bool& DeathDelay);
+	bool HandleEvents(const SDL_Event& Event);
 	void Render();
-	void ResetCat();
 	void SetMode(const GameMode& mode);
 
 private:
@@ -34,4 +34,5 @@ private:
 
 	void ApplyGravity(const float& DeltaTime);
 	void Idle(const float& DeltaTime);
+	void ResetCat();
 };

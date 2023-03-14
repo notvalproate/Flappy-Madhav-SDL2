@@ -11,7 +11,6 @@ Map::Map(SDL_Renderer* Ren, const int& width, const int& height, const int& veln
 	HS = new HighScore("assets/textures/numbers.png", "assets/textures/star.png", Ren, width, height);
 	//Only 4 pipes as there are max of 4 pipes on the screen at once
 	for (int i = 0; i < 4; i++) {
-		std::cout << "Pipe" << i;
 		P[i] = new Pipe("assets/textures/top_pipe.png", "assets/textures/bottom_pipe.png", Renderer, width, height, i, veln, vels, 0);
 	}
 }
