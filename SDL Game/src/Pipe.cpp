@@ -114,23 +114,26 @@ void Pipe::SetPipeGap(const int& offset, const int& previousy) {
 
 	//Minimum height from top is 1/10th of screen height, then + random multiple of ScreenHeight / 18 - NORMAL
 	//Otherwise input y value of previous pipe, and offset it by a bit - SPEEDY
-	int bottom = 0;
+	int PipeHoleY = 0;
 	std::uniform_int_distribution<int> dists(-2, 2);
 	std::uniform_int_distribution<int> distn(0, 8);
 
+	//Based on the mode, choose what the 
 	switch (Mode) {
 	case Normal:
-		bottom = (ScreenH / 10) + (distn(gen) * (ScreenH / 18));
+		//Completely random position
+		PipeHoleY = (ScreenH / 10) + (distn(gen) * (ScreenH / 18));
 		break;
 	case Speedy:
-		bottom = previousy + (dists(gen) * (ScreenH / 20));
-		bottom = std::max(ScreenH / 10, std::min((5 * ScreenH) / 9, bottom)); //Clamp the value between h/10 and 5h/9
+		//Position is random but a small offset from the previous pipe hole location
+		PipeHoleY = previousy + (dists(gen) * (ScreenH / 20));
+		PipeHoleY = std::max(ScreenH / 10, std::min((5 * ScreenH) / 9, PipeHoleY)); //Clamp the value between h/10 and 5h/9
 		break;
 	}
 
 	//Set y value of the rectangles top left corners
-	Top.y = bottom - Top.h;
-	Bottom.y = bottom + (ScreenW / 8);
+	Top.y = PipeHoleY - Top.h;
+	Bottom.y = PipeHoleY + (ScreenW / 8);
 
 	//The X position of each pipe is chosen with an offset in the beginning of the game. 
 	PipeX = ScreenW + offset * (ScreenW + Top.w) / 4;

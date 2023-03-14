@@ -13,13 +13,11 @@ Floor::Floor(const char* texturepath, SDL_Renderer* Ren, const int& width, const
 	SDL_Point size;
 	SDL_QueryTexture(FloorTex, NULL, NULL, &size.x, &size.y);
 
-	DestRect.y = (height * 9) / 10;
-	DestRect.w = 2 * width;
-	DestRect.h = height / 10;
+	DestRect = { 0, (height * 9) / 10, 2 * width, height / 10 };
 
 	//Set Floor postions;
 	FloorX = 0;
-	DestRect.x = 0;
+	
 
 	CurrVel = veln; //Velocity at which the map will move towards the left;
 	VelocityN = veln;

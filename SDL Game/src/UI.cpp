@@ -5,6 +5,7 @@
 #include "GameModes.hpp"
 
 UIComponent::UIComponent(const SDL_Rect& Src, const SDL_Rect& Dest) {
+	//Initialize rectangles and animation length;
 	SrcRect = Src;
 	DestRect = Dest;
 	Original = Dest;
@@ -16,6 +17,7 @@ UIComponent::UIComponent(const SDL_Rect& Src, const SDL_Rect& Dest) {
 UIComponent::~UIComponent() { }
 
 void UIComponent::UnSelect() {
+	//Set state to animateout and subsequently unselected
 	if (State == Selected) State = AnimateOut;
 }
 
@@ -23,20 +25,23 @@ bool UIComponent::CheckClick() {
 	SDL_Point P;
 	SDL_GetMouseState(&P.x, &P.y);
 
+	//Check for click on the component
 	if (SDL_PointInRect(&P, &DestRect)) {
 		switch (State) {
 		case Unselected:
-			State = AnimateIn;
+			State = AnimateIn; //If unselected and clicked, animate in and subsequently make selected
 			return true;
 		case NoSelection:
-			return true;
+			return true;  //If component is a no selection object, always return true on click
 		}
 	}
 
+	//Return false, not detecting click if it is during animation or already selected
 	return false;
 }
 
 void UIComponent::ScaleAboutCenter(const float& factor) {
+	//Scale the rectangle about it's center, relative to its original size
 	DestRect.x = Original.x - std::round(((factor - 1) * Original.w) / (float) 2);
 	DestRect.y = Original.y - std::round(((factor - 1) * Original.h) / (float) 2);
 	DestRect.w = std::round(factor * Original.w);
@@ -44,9 +49,10 @@ void UIComponent::ScaleAboutCenter(const float& factor) {
 }
 
 void UIComponent::Update(const int& DeltaTime) {
+	//Animation In logic
 	if (State == AnimateIn) {
 		KeyFrame += DeltaTime;
-		if (KeyFrame >= AnimLength) {
+		if (KeyFrame >= AnimLength) { //Once animation is over, reset keyframe and state to selected
 			KeyFrame = 0;
 			State = Selected;
 			return;
@@ -69,9 +75,10 @@ void UIComponent::Update(const int& DeltaTime) {
 		}
 		return;
 	}
+	//Animation Out Logic
 	if (State == AnimateOut) {
 		KeyFrame += DeltaTime;
-		if (KeyFrame >= AnimLength) {
+		if (KeyFrame >= AnimLength) { //Once animation is over, reset keyframe and state to selected
 			KeyFrame = 0;
 			State = Unselected;
 			return;
@@ -101,6 +108,8 @@ UI::UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& heig
 
 	//Initialize Components
 	SDL_Rect Src, Dest;
+
+	//Src and position for Settings button
 	Src = { 0, 0, 27, 28 };
 
 	Dest.x = height / 20;
@@ -109,8 +118,9 @@ UI::UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& heig
 	Dest.y = ((height * 19) / 20) - Dest.h;
 
 	Settings = new UIComponent(Src, Dest);
-	Settings->State = NoSelection;
+	Settings->State = NoSelection; //No different states, hence no selection
 
+	//Src and position for Menu background
 	Src.x += Src.w;
 	Src.w = 83;
 	Src.h = 84;
@@ -121,7 +131,9 @@ UI::UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& heig
 	Dest.y = (height / 2) - (Dest.h) / 2;
 
 	Menu = new UIComponent(Src, Dest);
-	Menu->State = NoSelection;
+	Menu->State = NoSelection; //No different states, hence no selection
+
+	//Src and position for Normal Mode button
 	Src.x += Src.w;
 	Src.w = 27;
 	Src.h = 28;
@@ -132,9 +144,11 @@ UI::UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& heig
 	Dest.y = (height / 2) - (Dest.h);
 
 	NMode = new UIComponent(Src, Dest);
+	//Set to selected by default and scale it
 	NMode->State = Selected;
 	NMode->ScaleAboutCenter(1.2);
 
+	//Src and position for Speedy Mode button (same as normal mode except x position changed)
 	Src.x += Src.w;
 	Dest.x = ((2 * width) / 3) - Dest.w - (width / 18);
 
@@ -143,63 +157,83 @@ UI::UI(const char* texpath, SDL_Renderer* ren, const int& width, const int& heig
 
 UI::~UI() { }
 
-bool UI::HandleEvents(const SDL_Event& event, Audio* Click, Music* BGM) {
-	switch (event.type){
-	case SDL_MOUSEBUTTONDOWN:
-		if (!Open && Settings->CheckClick()) {
+bool UI::HandleClick(const SDL_Event& event, Audio* Click, Music* BGM) {
+	//Check click on settings button only when menu is not open
+	if (!Open && Settings->CheckClick()) {
+		Click->PlaySound();
+		Open = true;
+		return true;
+	}
+	
+	//Check for click on menu only when menu is open
+	if (Open && Menu->CheckClick()) {
+		//Check if normal mode was clicked, if yes, unselect Speedy mode and set the map and cat modes
+		if (NMode->CheckClick()) {
 			Click->PlaySound();
-			Open = true;
-			return true;
+			SMode->UnSelect();
+			TheMap->SetMode(Normal);
+			TheCat->SetMode(Normal);
 		}
-		
-		if (Open && Menu->CheckClick()) {
-			if (NMode->CheckClick()) {
-				Click->PlaySound();
-				SMode->UnSelect();
-				TheMap->SetMode(Normal);
-				TheCat->SetMode(Normal);
-			}
-			else if (SMode->CheckClick()) {
-				Click->PlaySound();
-				NMode->UnSelect();
-				TheMap->SetMode(Speedy);
-				TheCat->SetMode(Speedy);
-			}
-			else {
-				if (SFXSlider->HandleEvent(event)) {
-					Click->PlaySound();
-				}
-				if (MusicSlider->HandleEvent(event)) {
-					BGM->PlayMusic();
-				}
-			}
-			return true;
+		//Vice versa for click on speedy mode
+		else if (SMode->CheckClick()) {
+			Click->PlaySound();
+			NMode->UnSelect();
+			TheMap->SetMode(Speedy);
+			TheCat->SetMode(Speedy);
 		}
-		Open = false;
-		return false;
-
-	case SDL_MOUSEMOTION: case SDL_MOUSEBUTTONUP:
-		if (Open) {
+		//Else check for events on the sliders, and play respective sounds for user to check volume
+		else {
 			if (SFXSlider->HandleEvent(event)) {
 				Click->PlaySound();
 			}
-			if (MusicSlider->HandleEvent(event)) {
-				if (event.type == SDL_MOUSEBUTTONUP) {
-					BGM->StopMusic();
-				}
-				else {
-					BGM->PlayMusic();
-				}
+			else if (MusicSlider->HandleEvent(event)) {
+				BGM->PlayMusic();
 			}
-			return true;
 		}
-		return false;
+		return true;
+	}
+	//If none, means click was outside the menu, so close the menu
+	Open = false;
+	return false;
+}
+
+bool UI::HandleMotionUp(const SDL_Event& event, Audio* Click, Music* BGM) {
+	//Only check this if it is Open
+	if (!Open) return false;
+
+	//If motion/up detected on the sfx slider, play the sound
+	if (SFXSlider->HandleEvent(event)) {
+		Click->PlaySound();
+		return true;
+	}
+	//If Up detected, stop the music as mouse is no longer on music slider
+	if (MusicSlider->HandleEvent(event)) {
+		if (event.type == SDL_MOUSEBUTTONUP) {
+			BGM->StopMusic();
+		}
+		return true;
+	}
+	//Either way, return true, as it is not a click, and return false will close the menu in game.cpp but not in the UI
+	//we return false only when there is a click outside the meny area
+	return true;
+}
+
+bool UI::HandleEvents(const SDL_Event& event, Audio* Click, Music* BGM) {
+	//Handle each event
+	switch (event.type){
+	case SDL_MOUSEBUTTONDOWN:
+		return HandleClick(event, Click, BGM);
+
+	case SDL_MOUSEMOTION: case SDL_MOUSEBUTTONUP:
+		return HandleMotionUp(event, Click, BGM);
+
 	default:
-		if(Open) return true;
+		if(Open) return true; //Return true by default if menu is open, if not open, return false
 		return false;
 	}
 }
 
+//Self Explanatory
 int UI::GetSFXVol() {
 	return SFXSlider->GetValue();
 }
@@ -209,6 +243,7 @@ int UI::GetMusicVol() {
 }
 
 void UI::Update(const int& DeltaTime) {
+	//Update Buttons with deltatime to animate
 	SMode->Update(DeltaTime);
 	NMode->Update(DeltaTime);
 }

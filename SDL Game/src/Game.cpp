@@ -109,20 +109,23 @@ void Game::TogglePause() {
 }
 
 void Game::GameEvents(const SDL_Event& Event) {
+	//Handle game window events like fullscreen, pause, and sdl_quit
 	if (Event.type == SDL_QUIT) {
 		IsRunning = false;
 		return;
 	}
 	if (Event.type == SDL_KEYDOWN) {
-		switch (Event.key.keysym.sym) {
+		switch (Event.key.keysym.sym) { //Check for which key, pause if esc, toggle fullscreen if f11
 		case SDLK_ESCAPE:
 			TogglePause();
 			break;
 		case SDLK_F11:
-			if (!(SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) { 
+			//If the window doesnt have fullscreen flag, set the window to fullscreen
+			if (!(SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) {
 				SDL_SetWindowFullscreen(Window, SDL_WINDOW_FULLSCREEN); 
 				break;
 			}
+			//Else remove window fullscreen flag and set resolution
 			SDL_SetWindowFullscreen(Window, 0); 
 			SDL_SetWindowSize(Window, 1280, 720); 
 			break;
@@ -135,11 +138,12 @@ void Game::HandleEvents() {
 	if (!DeathDelay || (DelayCount > 500)) { //Check for event only if it has been 500ms since death, hence "DeathDelay"
 		switch (State) {
 		case Menu:
+			//If menu UI was not clicked, return state to readyscreen
 			if (!MenuScreen->HandleEvents(Event, Click, BGM)) {
 				State = ReadyScreen;
 			}
 			else {
-				int MusicVol = MenuScreen->GetMusicVol();
+				int MusicVol = MenuScreen->GetMusicVol(); //Else get the volumes and setvolume for all
 				int SFXVol = MenuScreen->GetSFXVol();
 				Death->SetVolume(SFXVol);
 				Point->SetVolume(SFXVol);
@@ -149,9 +153,11 @@ void Game::HandleEvents() {
 			}
 			break;
 		case ReadyScreen:
+			//If settings button was pressed, go to menu
 			if (MenuScreen->HandleEvents(Event, Click, BGM)) {
 				State = Menu;
 			}
+			//else check if cat was pressed
 			else if(Catto->HandleEvents(Event)) {
 				Jump->PlaySound();
 				BGM->PlayMusic();
@@ -159,15 +165,18 @@ void Game::HandleEvents() {
 			}
 			break;
 		case InGame:
+			//Check for click on cat and play sound
 			if(Catto->HandleEvents(Event)) Jump->PlaySound();
 			break;
 		case DeathScreen:
+			//If cat pressed on death screen, reset the map and set state to readyscreen
 			if (Catto->HandleEvents(Event)) {
 				State = ReadyScreen;
 				TheMap->ResetMap();
 			}
 			break;
 		}
+		//Check for game events like f11 and pause at the end
 		GameEvents(Event);
 		DeathDelay = false; // Remove the Delay condition and reset the DelayCount
 		DelayCount = 0;
@@ -211,7 +220,7 @@ void Game::Render() {
 			MenuScreen->RenderUI();
 			break;
 		case Menu:
-			MenuScreen->RenderUI();
+			MenuScreen->RenderUI(); //Render the Menu
 			break;
 		case Pause:
 			SDL_RenderCopy(Renderer, Titles[2], NULL, &TitleRect[2]); //Pause Button texture if paused

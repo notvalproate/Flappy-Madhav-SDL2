@@ -75,7 +75,9 @@ void Score::Increment() {
 }
 
 void Score::Render() {
+	//Output digits from left to right, new X is += previous digits width + 1 pixel gap
 	for (int i = Digits.size() - 1; i >= 0; i--) {
+		//For all digits except 1, width is 7 pixels. For 1, width is 5 pixels
 		if (Digits[i] == 1) {
 			DestRect.w = DestRect.h / 2;
 		}
@@ -85,12 +87,13 @@ void Score::Render() {
 		SDL_RenderCopy(Renderer, NumTex, &NumSrc[Digits[i]], &DestRect);
 		DestRect.x += DestRect.w + 1;
 	}
-
+	//Reset the x value to the beginning for next render
 	DestRect.x = ResetX;
 }
 
 
 HighScore::HighScore(const char* texpath, const char* startex, SDL_Renderer* Ren, const int& width, const int& height) {
+	//Set destination rectangle, except width, which is calculated on render
 	DestRect.x = (width - (height / 20)) + 1;
 	DestRect.y = height / 20;
 	DestRect.h = height / 10; 
@@ -98,6 +101,7 @@ HighScore::HighScore(const char* texpath, const char* startex, SDL_Renderer* Ren
 
 	Mode = Normal;
 
+	//Read the highscore from hs.dat
 	Read();
 	Renderer = Ren;
 	NumTex = Texture::LoadTexture(texpath, Ren);
@@ -111,7 +115,9 @@ HighScore::~HighScore() {
 }
 
 void HighScore::Render() {
+	//Output digits from right to left
 	for (int i = 0; i < Digits.size(); i++) {
+		//Same logic as render for score
 		if (Digits[i] == 1) {
 			DestRect.w = DestRect.h / 2;
 		}
@@ -122,34 +128,42 @@ void HighScore::Render() {
 		SDL_RenderCopy(Renderer, NumTex, &NumSrc[Digits[i]], &DestRect);
 	}
 
+	//set rect as a square, add 5 pixels to the right and render the star
 	DestRect.w = DestRect.h;
 	DestRect.x -= (DestRect.w + 5);
 	SDL_RenderCopy(Renderer, StarTex, NULL, &DestRect);
 
+	//Reset the x value
 	DestRect.x = ResetX;
 }
 
 void HighScore::Read() {
+	//Open hs.dat to read
 	long long hs;
 	std::ifstream os("assets/hs.dat", std::ios::binary);
 
+	//If mode is speedy, offset and then read
 	if (Mode == Speedy) os.seekg(sizeof(hs), std::ios::beg);
 	os.read((char*)&hs, sizeof(hs));
 	os.close();
 	Count = hs - 4782423574423854;
+	//Convert the count to digits
 	GetDigits();
 }
 
 void HighScore::Write() {
+	//Open hs.dat to write
 	long long hs = Count + 4782423574423854;
 	std::ofstream os("assets/hs.dat", std::ios::binary | std::ios::in | std::ios::out);
 
+	//If mode is speedy, offset and then write
 	if (Mode == Speedy) os.seekp(sizeof(hs), std::ios::beg);
 	os.write((char*)&hs, sizeof(hs));
 	os.close();
 }
 
 void HighScore::SetMode(const GameMode& mode) {
+	//change mode and then RE-read the score
 	Mode = mode;
 	Read();
 }

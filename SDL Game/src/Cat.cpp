@@ -30,7 +30,7 @@ Cat::~Cat() {
 }
 
 bool Cat::HandleEvents(const SDL_Event& Event) {
-	bool EventOccured = false;
+	bool EventOccured = false; //Bool to check if event with cat occured (since only one type of event)
 
 	switch (Event.type) {
 	case SDL_MOUSEBUTTONDOWN:
@@ -42,6 +42,7 @@ bool Cat::HandleEvents(const SDL_Event& Event) {
 		}
 	}
 
+	//If event occured and cat is not dead, jump. Otherwise, means on deathscreen, reset the cat
 	if (EventOccured) {
 		if (State != Dead) {
 			Jump();
@@ -51,6 +52,7 @@ bool Cat::HandleEvents(const SDL_Event& Event) {
 		}
 	}
 
+	//Return whether event occured or not
 	return EventOccured;
 }
 
@@ -73,6 +75,7 @@ void Cat::Jump() {
 
 void Cat::SetMode(const GameMode& mode) {
 	Mode = mode;
+	//Change velocity modifier based on game mode
 	switch (Mode) {
 	case Normal:
 		VelFac = -12;

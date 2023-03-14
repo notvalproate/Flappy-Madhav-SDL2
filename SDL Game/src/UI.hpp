@@ -41,6 +41,8 @@ public:
 	bool HandleEvents(const SDL_Event& event, Audio* Click, Music* BGM);
 	void RenderUI();
 	void Update(const int& DeltaTime);
+	bool HandleClick(const SDL_Event& event, Audio* Click, Music* BGM);
+	bool HandleMotionUp(const SDL_Event& event, Audio* Click, Music* BGM);
 	int GetSFXVol();
 	int GetMusicVol();
 
