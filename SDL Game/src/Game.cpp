@@ -98,11 +98,11 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 }
 
 void Game::TogglePause() {
-	if(State == InGame) { 
+	switch (State) {
+	case InGame:
 		State = Pause;
 		BGM->PauseMusic();
-	}
-	else {
+	case Pause:
 		State = InGame; //Else if Game already Paused, Resume music and state back to InGame
 		BGM->ResumeMusic();
 	}

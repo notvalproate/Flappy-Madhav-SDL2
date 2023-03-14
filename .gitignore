@@ -3,6 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Libraries
+SDL2-2.26.3/
+SDL2_mixer-2.6.3/
+SDL2_image-2.6.3/
+
 # User-specific files
 *.rsuser
 *.suo
