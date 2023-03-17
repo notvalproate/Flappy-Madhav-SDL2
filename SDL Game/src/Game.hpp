@@ -48,4 +48,6 @@ private:
 
 	bool InFocus();
 	void TogglePause();
+	void ReadVolume();
+	void WriteVolume();
 };

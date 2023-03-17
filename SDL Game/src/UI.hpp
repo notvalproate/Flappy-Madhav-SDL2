@@ -45,6 +45,7 @@ public:
 	bool HandleMotionUp(const SDL_Event& event, Audio* Click, Music* BGM);
 	int GetSFXVol();
 	int GetMusicVol();
+	void SetSliders(const int& sfx, const int& music);
 
 private:
 	bool Open;

@@ -242,6 +242,11 @@ int UI::GetMusicVol() {
 	return MusicSlider->GetValue();
 }
 
+void UI::SetSliders(const int& sfx, const int& music) {
+	SFXSlider->SetAbsValue(sfx);
+	MusicSlider->SetAbsValue(music);
+}
+
 void UI::Update(const int& DeltaTime) {
 	//Update Buttons with deltatime to animate
 	SMode->Update(DeltaTime);

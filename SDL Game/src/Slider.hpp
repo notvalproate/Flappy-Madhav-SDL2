@@ -11,7 +11,8 @@ public:
     void Render();
     bool HandleEvent(const SDL_Event& event);
     int GetValue() { return Value; }
-    void SetValue(int newValue);
+    void SetValue(const int& MouseX);
+    void SetAbsValue(const int& value);
 
 private:
     int MinValue, MaxValue, Value;

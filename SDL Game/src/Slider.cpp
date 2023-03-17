@@ -53,11 +53,15 @@ void Slider::Render() {
     SDL_RenderCopy(Renderer, HandleTex, NULL, &HandleRect);
 }
 
-void Slider::SetValue(int MouseX) {
+void Slider::SetValue(const int& MouseX) {
     //Get ratio of the position of the mouse on the bar, to the bar's width
     float valueRatio = (float)(MouseX - BarRect.x) / (float)BarRect.w;
     //Convert that ratio into a value
     int newValue = MinValue + (int)(valueRatio * (float)(MaxValue - MinValue));
     //Clamp the value between the min and max
     Value = std::max(MinValue, std::min(MaxValue, newValue)); 
+}
+
+void Slider::SetAbsValue(const int& value) {
+    Value = std::max(MinValue, std::min(MaxValue, value)); 
 }

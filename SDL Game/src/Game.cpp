@@ -1,6 +1,7 @@
 #include "Game.hpp"
 #include "SDL_mixer.h"
 #include <iostream>
+#include <fstream>
 
 Game::Game() : IsRunning(false), FrameDelta(16), Window(nullptr), Renderer(nullptr), DeathDelay(false), DelayCount(0), State(ReadyScreen) { }
  
@@ -86,7 +87,7 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 	}
 	std::cout << "Stage: Initialized Mixer..." << std::endl;
 
-	//Audio and Music Objects
+	//Audio and Music Objects and get their volume
 	Jump = new Audio("assets/audio/jump.wav", 50, 1);
 	Death = new Audio("assets/audio/death.wav", 50, -1);
 	Point = new Audio("assets/audio/point.wav", 50, 0);
@@ -95,6 +96,8 @@ void Game::Init(const char* title, const char* iconpath, const int& x, const int
 
 	//Menu UI
 	MenuScreen = new UI("assets/textures/ui.png", Renderer, w, h, TheMap, Catto);
+
+	ReadVolume();
 }
 
 void Game::TogglePause() {
@@ -102,15 +105,18 @@ void Game::TogglePause() {
 	case InGame:
 		State = Pause;
 		BGM->PauseMusic();
+		break;
 	case Pause:
 		State = InGame; //Else if Game already Paused, Resume music and state back to InGame
 		BGM->ResumeMusic();
+		break;
 	}
 }
 
 void Game::GameEvents(const SDL_Event& Event) {
 	//Handle game window events like fullscreen, pause, and sdl_quit
 	if (Event.type == SDL_QUIT) {
+		WriteVolume();
 		IsRunning = false;
 		return;
 	}
@@ -121,8 +127,10 @@ void Game::GameEvents(const SDL_Event& Event) {
 			break;
 		case SDLK_F11:
 			//If the window doesnt have fullscreen flag, set the window to fullscreen
+			std::cout << SDL_GetWindowGrab(Window) << std::endl;
 			if (!(SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) {
 				SDL_SetWindowFullscreen(Window, SDL_WINDOW_FULLSCREEN); 
+				SDL_SetWindowSize(Window, Mode.w, Mode.h);
 				break;
 			}
 			//Else remove window fullscreen flag and set resolution
@@ -256,4 +264,35 @@ void Game::Clean() {
 bool Game::InFocus() {
 	//Get the window's flags and check if it is In Focus.
 	return (SDL_GetWindowFlags(Window) & (SDL_WINDOW_MINIMIZED | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS));
+}
+
+void Game::ReadVolume() {
+	//Open hs.dat to read
+	int sfx, music;
+	std::ifstream os("assets/hs.dat", std::ios::binary);
+
+	//If mode is speedy, offset and then read
+	os.seekg(16, std::ios::beg);
+	os.read((char*)&sfx, sizeof(sfx));
+	os.read((char*)&music, sizeof(music));
+	os.close();
+
+	Death->SetVolume(sfx);
+	Point->SetVolume(sfx);
+	Jump->SetVolume(sfx);
+	Click->SetVolume(sfx);
+	BGM->SetVolume(music);
+
+	MenuScreen->SetSliders(sfx, music);
+}
+
+void Game::WriteVolume() {
+	int sfx = MenuScreen->GetSFXVol(), music = MenuScreen->GetMusicVol();
+	std::ofstream os("assets/hs.dat", std::ios::binary | std::ios::in | std::ios::out);
+
+	//If mode is speedy, offset and then write
+	os.seekp(16, std::ios::beg);
+	os.write((char*)&sfx, sizeof(sfx));
+	os.write((char*)&music, sizeof(music));
+	os.close();
 }
